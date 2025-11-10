@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import json
 import os
+import shutil
 
 
 def to_int(s, default=0):
@@ -84,12 +85,44 @@ def parse_html(html):
                 if trophy_span:
                     trophies = to_int(trophy_span.get_text())
 
+                # try to parse trio like (1/2/3) or 1/2/3 with flexible spacing
                 txt = counts_div.get_text(" ", strip=True)
-                m = re.search(r'\((\d+)\/(\d+)\/(\d+)\)', txt)
+                m = re.search(r'\(?\s*(\d+)\s*/\s*(\d+)\s*/\s*(\d+)\s*\)?', txt)
                 if m:
                     gadgets = to_int(m.group(1))
                     star_powers = to_int(m.group(2))
                     gears = to_int(m.group(3))
+                else:
+                    # fallback: try anywhere in the header
+                    header_txt = header.get_text(" ", strip=True)
+                    m2 = re.search(r'\(?\s*(\d+)\s*/\s*(\d+)\s*/\s*(\d+)\s*\)?', header_txt)
+                    if m2:
+                        gadgets = to_int(m2.group(1))
+                        star_powers = to_int(m2.group(2))
+                        gears = to_int(m2.group(3))
+                    else:
+                        # last-resort: look for explicit labels
+                        g = re.search(r'gadgets\s*[:\-]?\s*(\d+)', header_txt, flags=re.I)
+                        spow = re.search(r'star\s*powers?\s*[:\-]?\s*(\d+)', header_txt, flags=re.I)
+                        gr = re.search(r'gears?\s*[:\-]?\s*(\d+)', header_txt, flags=re.I)
+                        if g: gadgets = to_int(g.group(1))
+                        if spow: star_powers = to_int(spow.group(1))
+                        if gr: gears = to_int(gr.group(1))
+            else:
+                # no counts_div - still try to extract from header text
+                header_txt = header.get_text(" ", strip=True)
+                m3 = re.search(r'\(?\s*(\d+)\s*/\s*(\d+)\s*/\s*(\d+)\s*\)?', header_txt)
+                if m3:
+                    gadgets = to_int(m3.group(1))
+                    star_powers = to_int(m3.group(2))
+                    gears = to_int(m3.group(3))
+                else:
+                    g = re.search(r'gadgets\s*[:\-]?\s*(\d+)', header_txt, flags=re.I)
+                    spow = re.search(r'star\s*powers?\s*[:\-]?\s*(\d+)', header_txt, flags=re.I)
+                    gr = re.search(r'gears?\s*[:\-]?\s*(\d+)', header_txt, flags=re.I)
+                    if g: gadgets = to_int(g.group(1))
+                    if spow: star_powers = to_int(spow.group(1))
+                    if gr: gears = to_int(gr.group(1))
 
         details = block.find('div', id=lambda x: x and str(x).startswith('details-'))
         if details:
@@ -152,10 +185,48 @@ def main():
 
     # write JSON (same data) into frontend/public for Vercel; do not create xlsx or local input file
     output_json = 'frontend/public/brawlers.json'
+    overrides_json = 'frontend/public/overrides.json'
     records = df.fillna('').to_dict(orient='records')
+
+    # ensure output directory exists
     os.makedirs(os.path.dirname(output_json), exist_ok=True)
+
+    # If overrides.json exists, load it and DO NOT overwrite it. If it does not exist,
+    # build a default overrides map in memory but DO NOT write it to disk — this prevents
+    # accidental overwrites of a user-edited overrides.json.
+    overrides_map = {}
+    if os.path.exists(overrides_json):
+        try:
+            with open(overrides_json, 'r', encoding='utf-8') as of:
+                overrides_map = json.load(of) or {}
+        except Exception:
+            overrides_map = {}
+    else:
+        # create defaults in memory only
+        for r in records:
+            name = r.get('Brawler')
+            if not name or str(name).strip().upper() == 'TOTAL':
+                continue
+            overrides_map[name] = {'Hypercharge': 'Yes'}
+
+    # merge overrides into records so frontend/public/brawlers.json includes override fields
+    merged_records = []
+    for r in records:
+        name = r.get('Brawler')
+        extra = overrides_map.get(name, {})
+        merged = {**r, **extra}
+        merged_records.append(merged)
+
+    # preserve previous published file (if any) as brawlers.prev.json for diffing in frontend
+    prev_path = os.path.join(os.path.dirname(output_json), 'brawlers.prev.json')
+    if os.path.exists(output_json):
+        try:
+            shutil.copyfile(output_json, prev_path)
+        except Exception:
+            pass
+
     with open(output_json, 'w', encoding='utf-8') as jf:
-        json.dump(records, jf, ensure_ascii=False, indent=2)
+        json.dump(merged_records, jf, ensure_ascii=False, indent=2)
 
     print(f'Kaydedildi: {output_json}')
 
