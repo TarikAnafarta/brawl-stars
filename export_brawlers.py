@@ -3,6 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import json
+import os
 
 
 def to_int(s, default=0):
@@ -125,8 +126,8 @@ def parse_file(path):
 
 
 def main():
-    input_path = r'c:\Users\tarik\Desktop\brawl\22PLQCR29'
-    output_path = r'c:\Users\tarik\Desktop\brawl\brawlers.xlsx'
+    input_path = '22PLQCR29'
+    output_path = 'brawlers.xlsx'
 
     fetch_profile('https://brawlify.com/stats/profile/22PLQCR29', input_path)
 
@@ -163,9 +164,10 @@ def main():
         ws['L1'] = 'Total Coins to MAX'
         ws['L2'] = total_coins_to_max
 
-    # write JSON (same data)
-    output_json = r'c:\Users\tarik\Desktop\brawl\brawlers.json'
+    # write JSON (same data) into frontend/public for Vercel
+    output_json = 'frontend/public/brawlers.json'
     records = df.fillna('').to_dict(orient='records')
+    os.makedirs(os.path.dirname(output_json), exist_ok=True)
     with open(output_json, 'w', encoding='utf-8') as jf:
         json.dump(records, jf, ensure_ascii=False, indent=2)
 
