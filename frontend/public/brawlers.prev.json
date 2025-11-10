@@ -2,7 +2,7 @@
   {
     "Brawler": "Moe",
     "Power": 11,
-    "Trophies": 932,
+    "Trophies": 1005,
     "Gadgets": 2,
     "Star Powers": 1,
     "Gears": 2,
@@ -204,17 +204,6 @@
     "Gadgets": 2,
     "Star Powers": 1,
     "Gears": 3,
-    "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
-  },
-  {
-    "Brawler": "Kaze",
-    "Power": 11,
-    "Trophies": 1000,
-    "Gadgets": 1,
-    "Star Powers": 1,
-    "Gears": 2,
     "Points to MAX": 0,
     "Coins to MAX": 0,
     "Hypercharge": "Yes"
@@ -578,6 +567,17 @@
     "Gadgets": 2,
     "Star Powers": 1,
     "Gears": 0,
+    "Points to MAX": 0,
+    "Coins to MAX": 0,
+    "Hypercharge": "Yes"
+  },
+  {
+    "Brawler": "Kaze",
+    "Power": 11,
+    "Trophies": 986,
+    "Gadgets": 1,
+    "Star Powers": 1,
+    "Gears": 2,
     "Points to MAX": 0,
     "Coins to MAX": 0,
     "Hypercharge": "Yes"
@@ -1058,7 +1058,7 @@
   {
     "Brawler": "TOTAL",
     "Power": "",
-    "Trophies": 76081,
+    "Trophies": 76140,
     "Gadgets": "",
     "Star Powers": "",
     "Gears": "",

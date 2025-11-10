@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import re
 import requests
 from bs4 import BeautifulSoup
@@ -157,8 +159,6 @@ def parse_html(html):
 
 
 def main():
-    output_path = 'brawlers.xlsx'
-
     html = fetch_profile('https://brawlify.com/stats/profile/22PLQCR29')
     rows = parse_html(html)
     if not rows:
@@ -183,17 +183,12 @@ def main():
     }
     df = pd.concat([df, pd.DataFrame([total_row])], ignore_index=True)
 
-    # write JSON (same data) into frontend/public for Vercel; do not create xlsx or local input file
     output_json = 'frontend/public/brawlers.json'
     overrides_json = 'frontend/public/overrides.json'
     records = df.fillna('').to_dict(orient='records')
 
-    # ensure output directory exists
     os.makedirs(os.path.dirname(output_json), exist_ok=True)
 
-    # If overrides.json exists, load it and DO NOT overwrite it. If it does not exist,
-    # build a default overrides map in memory but DO NOT write it to disk — this prevents
-    # accidental overwrites of a user-edited overrides.json.
     overrides_map = {}
     if os.path.exists(overrides_json):
         try:
@@ -202,14 +197,12 @@ def main():
         except Exception:
             overrides_map = {}
     else:
-        # create defaults in memory only
         for r in records:
             name = r.get('Brawler')
             if not name or str(name).strip().upper() == 'TOTAL':
                 continue
             overrides_map[name] = {'Hypercharge': 'Yes'}
 
-    # merge overrides into records so frontend/public/brawlers.json includes override fields
     merged_records = []
     for r in records:
         name = r.get('Brawler')
@@ -217,7 +210,6 @@ def main():
         merged = {**r, **extra}
         merged_records.append(merged)
 
-    # preserve previous published file (if any) as brawlers.prev.json for diffing in frontend
     prev_path = os.path.join(os.path.dirname(output_json), 'brawlers.prev.json')
     if os.path.exists(output_json):
         try:

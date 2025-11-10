@@ -46,9 +46,6 @@ yarn-error.log*
 # Logs
 *.log
 
-# Excel / local outputs
-brawlers.xlsx
-
 # Mac/Windows hidden files
 **/.DS_Store
 **/Thumbs.db

@@ -5,11 +5,17 @@ on:
     - cron: '0 */12 * * *'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   update:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
@@ -30,6 +36,8 @@ jobs:
           if [ -f brawlers.json ]; then
             mv brawlers.json frontend/public/brawlers.json || cp brawlers.json frontend/public/brawlers.json
           fi
-          git add frontend/public/brawlers.json brawlers.xlsx || true
+          if [ -f frontend/public/brawlers.json ]; then
+            git add frontend/public/brawlers.json
+          fi
           git commit -m "Update brawlers JSON" || echo "no changes"
           git push
