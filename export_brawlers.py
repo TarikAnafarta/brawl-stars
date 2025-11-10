@@ -13,7 +13,7 @@ def to_int(s, default=0):
     return int(s) if s != "" else default
 
 
-def fetch_profile(url, out_path):
+def fetch_profile(url):
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
@@ -42,13 +42,11 @@ def fetch_profile(url, out_path):
     except Exception:
         raise
 
-    with open(out_path, 'w', encoding='utf-8') as f:
-        f.write(html)
+    return html
 
 
-def parse_file(path):
-    with open(path, 'r', encoding='utf-8', errors='ignore') as f:
-        soup = BeautifulSoup(f, 'html.parser')
+def parse_html(html):
+    soup = BeautifulSoup(html, 'html.parser')
 
     rows = []
     blocks = soup.find_all('div', id=re.compile(r'^\d+$'))
@@ -126,12 +124,10 @@ def parse_file(path):
 
 
 def main():
-    input_path = '22PLQCR29'
     output_path = 'brawlers.xlsx'
 
-    fetch_profile('https://brawlify.com/stats/profile/22PLQCR29', input_path)
-
-    rows = parse_file(input_path)
+    html = fetch_profile('https://brawlify.com/stats/profile/22PLQCR29')
+    rows = parse_html(html)
     if not rows:
         print('Hiç brawler bulunamadı. Dosya yolunu kontrol edin.')
         return
@@ -154,24 +150,14 @@ def main():
     }
     df = pd.concat([df, pd.DataFrame([total_row])], ignore_index=True)
 
-    with pd.ExcelWriter(output_path, engine='openpyxl') as writer:
-        df.to_excel(writer, index=False, sheet_name='Brawlers')
-        ws = writer.sheets['Brawlers']
-        ws['J1'] = 'Total Trophies'
-        ws['J2'] = total_trophies
-        ws['K1'] = 'Total Points to MAX'
-        ws['K2'] = total_points_to_max
-        ws['L1'] = 'Total Coins to MAX'
-        ws['L2'] = total_coins_to_max
-
-    # write JSON (same data) into frontend/public for Vercel
+    # write JSON (same data) into frontend/public for Vercel; do not create xlsx or local input file
     output_json = 'frontend/public/brawlers.json'
     records = df.fillna('').to_dict(orient='records')
     os.makedirs(os.path.dirname(output_json), exist_ok=True)
     with open(output_json, 'w', encoding='utf-8') as jf:
         json.dump(records, jf, ensure_ascii=False, indent=2)
 
-    print(f'Kaydedildi: {output_path} and {output_json}')
+    print(f'Kaydedildi: {output_json}')
 
 
 if __name__ == '__main__':
