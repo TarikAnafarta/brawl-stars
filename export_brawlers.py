@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
 
+import argparse
+import os
 import re
+import shutil
+import sys
+import json
+
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 from bs4 import BeautifulSoup
 import pandas as pd
-import json
-import os
-import shutil
 
 
 def to_int(s, default=0):
@@ -16,7 +21,10 @@ def to_int(s, default=0):
     return int(s) if s != "" else default
 
 
-def fetch_profile(url):
+def fetch_profile(url, html_file=None, timeout=20):
+    """Fetch profile HTML. If html_file is provided and exists, read it.
+    Uses requests with retries. On CI (GITHUB_ACTIONS) we avoid launching browsers.
+    """
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
@@ -24,28 +32,55 @@ def fetch_profile(url):
         'Referer': 'https://www.google.com/'
     }
 
+    if html_file:
+        try:
+            with open(html_file, 'r', encoding='utf-8') as f:
+                return f.read()
+        except Exception as e:
+            raise RuntimeError(f"Failed to read HTML file {html_file}: {e}") from e
+
+    # use requests with retries to be more robust against transient failures
+    session = requests.Session()
+    retries = Retry(total=3, backoff_factor=1, status_forcelist=[429, 500, 502, 503, 504])
+    adapter = HTTPAdapter(max_retries=retries)
+    session.mount('https://', adapter)
+    session.mount('http://', adapter)
+
     try:
-        r = requests.get(url, headers=headers, timeout=20)
+        r = session.get(url, headers=headers, timeout=timeout)
         r.raise_for_status()
-        html = r.text
-    except requests.exceptions.HTTPError as http_err:
+        return r.text
+    except requests.exceptions.RequestException as req_err:
+        # If running in GitHub Actions or other CI, avoid invoking Playwright
+        if os.environ.get('GITHUB_ACTIONS'):
+            raise RuntimeError(f"Network fetch failed in CI: {req_err}") from req_err
+
+        # try Playwright only when not in CI and playwright is available
         try:
             from playwright.sync_api import sync_playwright
         except Exception:
             raise RuntimeError(
-                "requests returned HTTP error and Playwright is not installed.\nInstall Playwright and the browsers with:\n  pip install playwright\n  playwright install"
-            ) from http_err
+                "Network fetch failed and Playwright is not installed.\nInstall Playwright and the browsers with:\n  pip install playwright\n  python -m playwright install"
+            ) from req_err
 
         with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True)
+            browser = p.chromium.launch(headless=True, args=['--no-sandbox'])
             page = browser.new_page(user_agent=headers['User-Agent'])
-            page.goto(url, wait_until='networkidle')
+            try:
+                page.goto(url, wait_until='networkidle', timeout=60000)
+            except Exception:
+                try:
+                    page.goto(url, wait_until='load', timeout=60000)
+                except Exception:
+                    try:
+                        page.goto(url, timeout=60000)
+                        page.wait_for_timeout(2000)
+                    except Exception as e:
+                        browser.close()
+                        raise RuntimeError(f"Playwright failed to load {url}: {e}") from e
             html = page.content()
             browser.close()
-    except Exception:
-        raise
-
-    return html
+            return html
 
 
 def parse_html(html):
@@ -159,7 +194,25 @@ def parse_html(html):
 
 
 def main():
-    html = fetch_profile('https://brawlify.com/stats/profile/22PLQCR29')
+    parser = argparse.ArgumentParser(description='Export brawlers from brawlify profile')
+    parser.add_argument('--url', '-u', default='https://brawlify.com/stats/profile/22PLQCR29')
+    parser.add_argument('--html-file', '-f', help='Read profile HTML from local file')
+    parser.add_argument('--output', '-o', default='frontend/public/brawlers.json')
+    args = parser.parse_args()
+
+    output_json = args.output
+
+    try:
+        html = fetch_profile(args.url, html_file=args.html_file)
+    except Exception as e:
+        # In CI we prefer to avoid failing if there's an existing output file.
+        print(f"Warning: failed to fetch profile HTML: {e}")
+        if os.path.exists(output_json):
+            print(f"Using existing output file: {output_json}")
+            return
+        else:
+            raise
+
     rows = parse_html(html)
     if not rows:
         print('Hiç brawler bulunamadı. Dosya yolunu kontrol edin.')
@@ -183,8 +236,7 @@ def main():
     }
     df = pd.concat([df, pd.DataFrame([total_row])], ignore_index=True)
 
-    output_json = 'frontend/public/brawlers.json'
-    overrides_json = 'frontend/public/overrides.json'
+    overrides_json = os.path.join(os.path.dirname(output_json), 'overrides.json')
     records = df.fillna('').to_dict(orient='records')
 
     os.makedirs(os.path.dirname(output_json), exist_ok=True)
