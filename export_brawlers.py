@@ -52,7 +52,9 @@ def fetch_profile(url, html_file=None, timeout=20):
         return r.text
     except requests.exceptions.RequestException as req_err:
         # If running in GitHub Actions or other CI, avoid invoking Playwright
-        if os.environ.get('GITHUB_ACTIONS'):
+        # unless explicitly allowed by ALLOW_PLAYWRIGHT env var. This lets CI
+        # opt-in to using Playwright by setting that environment variable.
+        if os.environ.get('GITHUB_ACTIONS') and not os.environ.get('ALLOW_PLAYWRIGHT'):
             raise RuntimeError(f"Network fetch failed in CI: {req_err}") from req_err
 
         # try Playwright only when not in CI and playwright is available
@@ -64,20 +66,52 @@ def fetch_profile(url, html_file=None, timeout=20):
             ) from req_err
 
         with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True, args=['--no-sandbox'])
+            # Extra flags for CI
+            browser = p.chromium.launch(headless=True, args=['--no-sandbox', '--disable-dev-shm-usage'])
             page = browser.new_page(user_agent=headers['User-Agent'])
+            # increase default timeouts
+            page.set_default_navigation_timeout(90000)
+
+            # Block heavy or irrelevant resource types and common analytics domains
             try:
-                page.goto(url, wait_until='networkidle', timeout=60000)
+                def _route_handler(route, request):
+                    _rtype = request.resource_type
+                    url_l = request.url.lower()
+                    # abort images, stylesheets, fonts, and known analytics/ads providers to help networkidle
+                    if _rtype in ('image', 'stylesheet', 'font'):
+                        return route.abort()
+                    if any(x in url_l for x in ('google-analytics', 'googletagmanager', 'doubleclick', 'adsservice', 'facebook.net', 'optimizely')):
+                        return route.abort()
+                    return route.continue_()
+
+                page.route('**/*', _route_handler)
             except Exception:
+                # routing may not be available in some older playwright versions, ignore silently
+                pass
+
+            last_err = None
+            try:
+                page.goto(url, wait_until='networkidle', timeout=90000)
+            except Exception as e:
+                last_err = e
                 try:
-                    page.goto(url, wait_until='load', timeout=60000)
-                except Exception:
+                    page.goto(url, wait_until='load', timeout=90000)
+                except Exception as e2:
+                    last_err = e2
                     try:
-                        page.goto(url, timeout=60000)
-                        page.wait_for_timeout(2000)
-                    except Exception as e:
+                        page.goto(url, timeout=90000)
+                        page.wait_for_timeout(3000)
+                    except Exception as e3:
                         browser.close()
-                        raise RuntimeError(f"Playwright failed to load {url}: {e}") from e
+                        raise RuntimeError(f"Playwright failed to load {url}: {e3}") from e3
+
+            # Ensure key content present before taking HTML
+            try:
+                page.wait_for_selector('div[id^="details-"]', timeout=5000)
+            except Exception:
+                # ignore: selector may not exist but page content might still be present
+                pass
+
             html = page.content()
             browser.close()
             return html
