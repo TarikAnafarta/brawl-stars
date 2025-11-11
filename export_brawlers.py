@@ -76,7 +76,7 @@ def fetch_player_from_brawlstars(tag, api_key, timeout=20):
 
     # Ensure tag is safe for use in a URL; the API expects the tag to be prefixed with '%23' (encoded '#')
     safe_tag = urllib.parse.quote(tag, safe='')
-    url = f'https://api.brawlstars.com/v1/players/%23{safe_tag}'
+    url = f'https://proxy.royaleapi.dev/v1/players/%23{safe_tag}'
     headers = {
         'Authorization': f'Bearer {api_key}',
         'Accept': 'application/json',
