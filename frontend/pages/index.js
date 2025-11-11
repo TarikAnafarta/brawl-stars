@@ -103,6 +103,16 @@ export default function Page(){
   // total delta for all trophy changes
   const totalDelta = trophyDiffs.reduce((s,d)=> s + (Number(d.delta) || 0), 0)
 
+  // Helper: background color for Power cell
+  const getPowerBg = (r)=>{
+    const p11 = Number(r?.Power) === 11
+    const hv = String(r?.Hypercharge ?? '').toLowerCase()
+    const hasHyper = hv === 'yes' || hv === 'y' || hv === 'true' || hv === '1' || hv === '✓'
+    if(p11 && hasHyper) return '#fa00fd'
+    if(p11 && !hasHyper) return '#f8a123'
+    return 'transparent'
+  }
+
   return (
     <div style={{padding:20,fontFamily:'Arial',backgroundColor:'#eef8fb', minHeight: '100vh'}}>
       <h1>Brawlers</h1>
@@ -151,7 +161,7 @@ export default function Page(){
               {sorted.map((r,i)=>(
                 <tr key={i}>
                   <td>{r.Brawler}</td>
-                  <td>{r.Power}</td>
+                  <td style={{backgroundColor: getPowerBg(r), color: '#000'}}>{r.Power}</td>
                   <td>{r.Trophies}</td>
                   <td>{r.Hypercharge}</td>
                   <td>{r['Star Powers']}</td>
