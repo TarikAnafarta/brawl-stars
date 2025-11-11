@@ -3,14 +3,17 @@
 import os
 import json
 import requests
+import urllib.parse
+import sys
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
 # Credentials must be provided via environment variables for security
-API_KEY = os.environ.get('BRAWL_API_KEY')
-TAG = os.environ.get('BRAWL_TAG')
+# Trim whitespace and allow TAG to be provided with or without a leading '#'
+API_KEY = os.environ.get('BRAWL_API_KEY', '').strip()
+TAG = os.environ.get('BRAWL_TAG', '').strip().lstrip('#')
 OUTPUT_JSON = os.environ.get('OUTPUT_JSON') or 'frontend/public/brawlers.json'
 HISTORY_JSON = os.path.join(os.path.dirname(OUTPUT_JSON), 'hourly_changes.json')
 HISTORY_MAX = 24
@@ -64,14 +67,16 @@ def points_and_coins_to_max_for_power(power):
 
 def fetch_player_from_brawlstars(tag, api_key, timeout=20):
     """Fetch player JSON from the official Brawl Stars API using the provided API key.
-    The player tag must be passed without the leading '#'.
+    The player tag may be provided with or without the leading '#'.
 
     Returns parsed JSON dict on success or raises an exception on error.
     """
     if not api_key:
         raise RuntimeError('API key is required to fetch from Brawl Stars API')
 
-    url = f'https://api.brawlstars.com/v1/players/%23{tag}'
+    # Ensure tag is safe for use in a URL; the API expects the tag to be prefixed with '%23' (encoded '#')
+    safe_tag = urllib.parse.quote(tag, safe='')
+    url = f'https://api.brawlstars.com/v1/players/%23{safe_tag}'
     headers = {
         'Authorization': f'Bearer {api_key}',
         'Accept': 'application/json',
@@ -84,8 +89,20 @@ def fetch_player_from_brawlstars(tag, api_key, timeout=20):
     session.mount('https://', adapter)
     session.mount('http://', adapter)
 
-    r = session.get(url, headers=headers, timeout=timeout)
-    r.raise_for_status()
+    try:
+        r = session.get(url, headers=headers, timeout=timeout)
+        r.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        status = getattr(e.response, 'status_code', None)
+        # Provide a clearer error for authentication/permission issues
+        if status in (401, 403):
+            raise RuntimeError(
+                f'Brawl Stars API returned {status} (Unauthorized/Forbidden).\n'
+                'Possible causes: invalid API key, missing permissions, or API key not available to this runner.\n'
+                'Ensure repository secret BRAWL_API_KEY exists and the workflow exposes it via env.'
+            ) from e
+        raise
+
     return r.json()
 
 
@@ -177,16 +194,24 @@ def current_turkey_timestamp():
 def main():
     # ensure credentials provided
     if not API_KEY:
-        print('Error: BRAWL_API_KEY environment variable is not set.')
-        print('Set it in your environment or GitHub Actions secrets as BRAWL_API_KEY.')
-        return
+        print('Error: BRAWL_API_KEY environment variable is not set or is empty.')
+        print('Set it in your environment or GitHub Actions secrets as BRAWL_API_KEY and expose it to the workflow (env: BRAWL_API_KEY: ${{ secrets.BRAWL_API_KEY }}).')
+        sys.exit(2)
     if not TAG:
-        print('Error: BRAWL_TAG environment variable is not set.')
-        print('Set it in your environment or GitHub Actions secrets as BRAWL_TAG.')
-        return
+        print('Error: BRAWL_TAG environment variable is not set or is empty.')
+        print('Set it in your environment or GitHub Actions secrets as BRAWL_TAG (without the leading #).')
+        sys.exit(2)
 
     # fetch current data from API
-    player_json = fetch_player_from_brawlstars(TAG, API_KEY)
+    try:
+        player_json = fetch_player_from_brawlstars(TAG, API_KEY)
+    except RuntimeError as e:
+        print(f'Error: {e}')
+        sys.exit(2)
+    except requests.exceptions.RequestException as e:
+        print(f'Network/API request failed: {e}')
+        sys.exit(2)
+
     rows = parse_player_json(player_json)
 
     if not rows:
