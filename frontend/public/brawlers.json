@@ -7,8 +7,7 @@
     "Star Powers": 2,
     "Gears": 2,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "COLT",
@@ -18,8 +17,7 @@
     "Star Powers": 2,
     "Gears": 0,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "No"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "BULL",
@@ -29,8 +27,7 @@
     "Star Powers": 2,
     "Gears": 2,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "BROCK",
@@ -40,8 +37,7 @@
     "Star Powers": 2,
     "Gears": 2,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "RICO",
@@ -51,8 +47,7 @@
     "Star Powers": 1,
     "Gears": 0,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "No"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "SPIKE",
@@ -62,8 +57,7 @@
     "Star Powers": 1,
     "Gears": 0,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "No"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "BARLEY",
@@ -73,8 +67,7 @@
     "Star Powers": 2,
     "Gears": 0,
     "Points to MAX": 2330,
-    "Coins to MAX": 4675,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 4675
   },
   {
     "Brawler": "JESSIE",
@@ -84,8 +77,7 @@
     "Star Powers": 2,
     "Gears": 2,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "NITA",
@@ -95,8 +87,7 @@
     "Star Powers": 2,
     "Gears": 0,
     "Points to MAX": 2330,
-    "Coins to MAX": 4675,
-    "Hypercharge": "No"
+    "Coins to MAX": 4675
   },
   {
     "Brawler": "DYNAMIKE",
@@ -106,8 +97,7 @@
     "Star Powers": 2,
     "Gears": 2,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "EL PRIMO",
@@ -117,8 +107,7 @@
     "Star Powers": 2,
     "Gears": 2,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "MORTIS",
@@ -128,8 +117,7 @@
     "Star Powers": 1,
     "Gears": 2,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "CROW",
@@ -139,8 +127,7 @@
     "Star Powers": 1,
     "Gears": 3,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "POCO",
@@ -150,8 +137,7 @@
     "Star Powers": 2,
     "Gears": 1,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "BO",
@@ -161,8 +147,7 @@
     "Star Powers": 2,
     "Gears": 1,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "No"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "PIPER",
@@ -172,8 +157,7 @@
     "Star Powers": 2,
     "Gears": 2,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "PAM",
@@ -183,19 +167,17 @@
     "Star Powers": 1,
     "Gears": 0,
     "Points to MAX": 2330,
-    "Coins to MAX": 4675,
-    "Hypercharge": "No"
+    "Coins to MAX": 4675
   },
   {
     "Brawler": "TARA",
     "Power": 9,
-    "Trophies": 621,
+    "Trophies": 696,
     "Gadgets": 2,
     "Star Powers": 2,
     "Gears": 0,
     "Points to MAX": 2330,
-    "Coins to MAX": 4675,
-    "Hypercharge": "No"
+    "Coins to MAX": 4675
   },
   {
     "Brawler": "DARRYL",
@@ -205,8 +187,7 @@
     "Star Powers": 2,
     "Gears": 0,
     "Points to MAX": 2330,
-    "Coins to MAX": 4675,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 4675
   },
   {
     "Brawler": "PENNY",
@@ -216,8 +197,7 @@
     "Star Powers": 2,
     "Gears": 0,
     "Points to MAX": 2330,
-    "Coins to MAX": 4675,
-    "Hypercharge": "No"
+    "Coins to MAX": 4675
   },
   {
     "Brawler": "FRANK",
@@ -227,8 +207,7 @@
     "Star Powers": 2,
     "Gears": 0,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "No"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "GENE",
@@ -238,8 +217,7 @@
     "Star Powers": 1,
     "Gears": 3,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "TICK",
@@ -249,8 +227,7 @@
     "Star Powers": 2,
     "Gears": 0,
     "Points to MAX": 2330,
-    "Coins to MAX": 4675,
-    "Hypercharge": "No"
+    "Coins to MAX": 4675
   },
   {
     "Brawler": "LEON",
@@ -260,8 +237,7 @@
     "Star Powers": 2,
     "Gears": 2,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "ROSA",
@@ -271,8 +247,7 @@
     "Star Powers": 2,
     "Gears": 0,
     "Points to MAX": 2330,
-    "Coins to MAX": 4675,
-    "Hypercharge": "No"
+    "Coins to MAX": 4675
   },
   {
     "Brawler": "CARL",
@@ -282,8 +257,7 @@
     "Star Powers": 2,
     "Gears": 0,
     "Points to MAX": 2330,
-    "Coins to MAX": 4675,
-    "Hypercharge": "No"
+    "Coins to MAX": 4675
   },
   {
     "Brawler": "BIBI",
@@ -293,8 +267,7 @@
     "Star Powers": 0,
     "Gears": 0,
     "Points to MAX": 2880,
-    "Coins to MAX": 5925,
-    "Hypercharge": "No"
+    "Coins to MAX": 5925
   },
   {
     "Brawler": "8-BIT",
@@ -304,8 +277,7 @@
     "Star Powers": 2,
     "Gears": 1,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "SANDY",
@@ -315,8 +287,7 @@
     "Star Powers": 2,
     "Gears": 2,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "BEA",
@@ -326,8 +297,7 @@
     "Star Powers": 2,
     "Gears": 1,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "EMZ",
@@ -337,8 +307,7 @@
     "Star Powers": 2,
     "Gears": 0,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "MR. P",
@@ -348,8 +317,7 @@
     "Star Powers": 2,
     "Gears": 0,
     "Points to MAX": 2330,
-    "Coins to MAX": 4675,
-    "Hypercharge": "No"
+    "Coins to MAX": 4675
   },
   {
     "Brawler": "MAX",
@@ -359,8 +327,7 @@
     "Star Powers": 1,
     "Gears": 0,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "JACKY",
@@ -370,8 +337,7 @@
     "Star Powers": 1,
     "Gears": 2,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "GALE",
@@ -381,8 +347,7 @@
     "Star Powers": 1,
     "Gears": 3,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "NANI",
@@ -392,8 +357,7 @@
     "Star Powers": 0,
     "Gears": 0,
     "Points to MAX": 2880,
-    "Coins to MAX": 5925,
-    "Hypercharge": "No"
+    "Coins to MAX": 5925
   },
   {
     "Brawler": "SPROUT",
@@ -403,8 +367,7 @@
     "Star Powers": 0,
     "Gears": 0,
     "Points to MAX": 2880,
-    "Coins to MAX": 5925,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 5925
   },
   {
     "Brawler": "SURGE",
@@ -414,8 +377,7 @@
     "Star Powers": 2,
     "Gears": 0,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "COLETTE",
@@ -425,8 +387,7 @@
     "Star Powers": 1,
     "Gears": 0,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "AMBER",
@@ -436,8 +397,7 @@
     "Star Powers": 0,
     "Gears": 0,
     "Points to MAX": 3430,
-    "Coins to MAX": 7205,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 7205
   },
   {
     "Brawler": "LOU",
@@ -447,8 +407,7 @@
     "Star Powers": 2,
     "Gears": 1,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "BYRON",
@@ -458,8 +417,7 @@
     "Star Powers": 2,
     "Gears": 2,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "No"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "EDGAR",
@@ -469,8 +427,7 @@
     "Star Powers": 1,
     "Gears": 2,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "RUFFS",
@@ -480,8 +437,7 @@
     "Star Powers": 1,
     "Gears": 0,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "STU",
@@ -491,8 +447,7 @@
     "Star Powers": 0,
     "Gears": 0,
     "Points to MAX": 2880,
-    "Coins to MAX": 5925,
-    "Hypercharge": "No"
+    "Coins to MAX": 5925
   },
   {
     "Brawler": "BELLE",
@@ -502,8 +457,7 @@
     "Star Powers": 0,
     "Gears": 0,
     "Points to MAX": 3220,
-    "Coins to MAX": 6725,
-    "Hypercharge": "No"
+    "Coins to MAX": 6725
   },
   {
     "Brawler": "SQUEAK",
@@ -513,8 +467,7 @@
     "Star Powers": 1,
     "Gears": 1,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "GROM",
@@ -524,8 +477,7 @@
     "Star Powers": 2,
     "Gears": 2,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "No"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "BUZZ",
@@ -535,8 +487,7 @@
     "Star Powers": 2,
     "Gears": 2,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "GRIFF",
@@ -546,8 +497,7 @@
     "Star Powers": 1,
     "Gears": 2,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "ASH",
@@ -557,8 +507,7 @@
     "Star Powers": 0,
     "Gears": 0,
     "Points to MAX": 3220,
-    "Coins to MAX": 6725,
-    "Hypercharge": "No"
+    "Coins to MAX": 6725
   },
   {
     "Brawler": "MEG",
@@ -568,8 +517,7 @@
     "Star Powers": 0,
     "Gears": 0,
     "Points to MAX": 3430,
-    "Coins to MAX": 7205,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 7205
   },
   {
     "Brawler": "LOLA",
@@ -579,8 +527,7 @@
     "Star Powers": 0,
     "Gears": 0,
     "Points to MAX": 3430,
-    "Coins to MAX": 7205,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 7205
   },
   {
     "Brawler": "FANG",
@@ -590,8 +537,7 @@
     "Star Powers": 2,
     "Gears": 2,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "EVE",
@@ -601,8 +547,7 @@
     "Star Powers": 0,
     "Gears": 0,
     "Points to MAX": 3560,
-    "Coins to MAX": 7495,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 7495
   },
   {
     "Brawler": "JANET",
@@ -612,8 +557,7 @@
     "Star Powers": 0,
     "Gears": 0,
     "Points to MAX": 3560,
-    "Coins to MAX": 7495,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 7495
   },
   {
     "Brawler": "BONNIE",
@@ -623,8 +567,7 @@
     "Star Powers": 0,
     "Gears": 0,
     "Points to MAX": 2880,
-    "Coins to MAX": 5925,
-    "Hypercharge": "No"
+    "Coins to MAX": 5925
   },
   {
     "Brawler": "OTIS",
@@ -634,8 +577,7 @@
     "Star Powers": 0,
     "Gears": 0,
     "Points to MAX": 3430,
-    "Coins to MAX": 7205,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 7205
   },
   {
     "Brawler": "SAM",
@@ -645,8 +587,7 @@
     "Star Powers": 0,
     "Gears": 0,
     "Points to MAX": 3220,
-    "Coins to MAX": 6725,
-    "Hypercharge": "No"
+    "Coins to MAX": 6725
   },
   {
     "Brawler": "GUS",
@@ -656,8 +597,7 @@
     "Star Powers": 0,
     "Gears": 0,
     "Points to MAX": 2880,
-    "Coins to MAX": 5925,
-    "Hypercharge": "No"
+    "Coins to MAX": 5925
   },
   {
     "Brawler": "BUSTER",
@@ -667,8 +607,7 @@
     "Star Powers": 0,
     "Gears": 0,
     "Points to MAX": 3560,
-    "Coins to MAX": 7495,
-    "Hypercharge": "No"
+    "Coins to MAX": 7495
   },
   {
     "Brawler": "CHESTER",
@@ -678,8 +617,7 @@
     "Star Powers": 2,
     "Gears": 1,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "GRAY",
@@ -689,8 +627,7 @@
     "Star Powers": 1,
     "Gears": 0,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "MANDY",
@@ -700,8 +637,7 @@
     "Star Powers": 2,
     "Gears": 1,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "R-T",
@@ -711,8 +647,7 @@
     "Star Powers": 0,
     "Gears": 0,
     "Points to MAX": 3220,
-    "Coins to MAX": 6725,
-    "Hypercharge": "No"
+    "Coins to MAX": 6725
   },
   {
     "Brawler": "WILLOW",
@@ -722,8 +657,7 @@
     "Star Powers": 0,
     "Gears": 0,
     "Points to MAX": 3430,
-    "Coins to MAX": 7205,
-    "Hypercharge": "No"
+    "Coins to MAX": 7205
   },
   {
     "Brawler": "MAISIE",
@@ -733,8 +667,7 @@
     "Star Powers": 2,
     "Gears": 2,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "HANK",
@@ -744,8 +677,7 @@
     "Star Powers": 1,
     "Gears": 2,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "CORDELIUS",
@@ -755,8 +687,7 @@
     "Star Powers": 1,
     "Gears": 0,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "DOUG",
@@ -766,8 +697,7 @@
     "Star Powers": 0,
     "Gears": 0,
     "Points to MAX": 3220,
-    "Coins to MAX": 6725,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 6725
   },
   {
     "Brawler": "PEARL",
@@ -777,8 +707,7 @@
     "Star Powers": 0,
     "Gears": 0,
     "Points to MAX": 3560,
-    "Coins to MAX": 7495,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 7495
   },
   {
     "Brawler": "CHUCK",
@@ -788,8 +717,7 @@
     "Star Powers": 0,
     "Gears": 0,
     "Points to MAX": 3430,
-    "Coins to MAX": 7205,
-    "Hypercharge": "No"
+    "Coins to MAX": 7205
   },
   {
     "Brawler": "CHARLIE",
@@ -799,8 +727,7 @@
     "Star Powers": 1,
     "Gears": 2,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "MICO",
@@ -810,19 +737,17 @@
     "Star Powers": 2,
     "Gears": 0,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "No"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "KIT",
     "Power": 11,
-    "Trophies": 828,
+    "Trophies": 866,
     "Gadgets": 2,
     "Star Powers": 1,
     "Gears": 0,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "LARRY & LAWRIE",
@@ -832,8 +757,7 @@
     "Star Powers": 2,
     "Gears": 1,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "No"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "MELODIE",
@@ -843,8 +767,7 @@
     "Star Powers": 0,
     "Gears": 0,
     "Points to MAX": 3430,
-    "Coins to MAX": 7205,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 7205
   },
   {
     "Brawler": "ANGELO",
@@ -854,8 +777,7 @@
     "Star Powers": 1,
     "Gears": 0,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "DRACO",
@@ -865,8 +787,7 @@
     "Star Powers": 2,
     "Gears": 2,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "LILY",
@@ -876,8 +797,7 @@
     "Star Powers": 2,
     "Gears": 2,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "BERRY",
@@ -887,8 +807,7 @@
     "Star Powers": 0,
     "Gears": 0,
     "Points to MAX": 3560,
-    "Coins to MAX": 7495,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 7495
   },
   {
     "Brawler": "CLANCY",
@@ -898,8 +817,7 @@
     "Star Powers": 0,
     "Gears": 0,
     "Points to MAX": 3430,
-    "Coins to MAX": 7205,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 7205
   },
   {
     "Brawler": "MOE",
@@ -909,8 +827,7 @@
     "Star Powers": 1,
     "Gears": 2,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "No"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "KENJI",
@@ -920,8 +837,7 @@
     "Star Powers": 2,
     "Gears": 3,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "SHADE",
@@ -931,8 +847,7 @@
     "Star Powers": 1,
     "Gears": 0,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "JUJU",
@@ -942,8 +857,7 @@
     "Star Powers": 0,
     "Gears": 0,
     "Points to MAX": 3220,
-    "Coins to MAX": 6725,
-    "Hypercharge": "No"
+    "Coins to MAX": 6725
   },
   {
     "Brawler": "MEEPLE",
@@ -953,8 +867,7 @@
     "Star Powers": 0,
     "Gears": 0,
     "Points to MAX": 3220,
-    "Coins to MAX": 6725,
-    "Hypercharge": "No"
+    "Coins to MAX": 6725
   },
   {
     "Brawler": "OLLIE",
@@ -964,8 +877,7 @@
     "Star Powers": 1,
     "Gears": 1,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "LUMI",
@@ -975,8 +887,7 @@
     "Star Powers": 2,
     "Gears": 0,
     "Points to MAX": 2330,
-    "Coins to MAX": 4675,
-    "Hypercharge": "No"
+    "Coins to MAX": 4675
   },
   {
     "Brawler": "FINX",
@@ -986,8 +897,7 @@
     "Star Powers": 0,
     "Gears": 0,
     "Points to MAX": 3560,
-    "Coins to MAX": 7495,
-    "Hypercharge": "No"
+    "Coins to MAX": 7495
   },
   {
     "Brawler": "JAE-YONG",
@@ -997,8 +907,7 @@
     "Star Powers": 0,
     "Gears": 0,
     "Points to MAX": 3430,
-    "Coins to MAX": 7205,
-    "Hypercharge": "No"
+    "Coins to MAX": 7205
   },
   {
     "Brawler": "KAZE",
@@ -1008,8 +917,7 @@
     "Star Powers": 1,
     "Gears": 2,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "ALLI",
@@ -1019,8 +927,7 @@
     "Star Powers": 1,
     "Gears": 0,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "No"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "TRUNK",
@@ -1030,8 +937,7 @@
     "Star Powers": 0,
     "Gears": 0,
     "Points to MAX": 3220,
-    "Coins to MAX": 6725,
-    "Hypercharge": "No"
+    "Coins to MAX": 6725
   },
   {
     "Brawler": "MINA",
@@ -1041,8 +947,7 @@
     "Star Powers": 1,
     "Gears": 2,
     "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
+    "Coins to MAX": 0
   },
   {
     "Brawler": "ZIGGY",
@@ -1052,13 +957,12 @@
     "Star Powers": 0,
     "Gears": 0,
     "Points to MAX": 3740,
-    "Coins to MAX": 7765,
-    "Hypercharge": "No"
+    "Coins to MAX": 7765
   },
   {
     "Brawler": "TOTAL",
     "Power": "",
-    "Trophies": 76163,
+    "Trophies": 76276,
     "Gadgets": "",
     "Star Powers": "",
     "Gears": "",
