@@ -168,22 +168,36 @@ def build_trophies_map(records):
     return {r.get('Brawler'): to_int(r.get('Trophies')) for r in records if r.get('Brawler')}
 
 
-def format_changes(prev_map, curr_map):
-    """Format the changes in trophies between two maps for display."""
+def format_changes(prev_map, curr_map, max_lines=24):
+    """Format the changes in trophies between two maps for display.
+
+    - Excludes the synthetic 'TOTAL' row (case-insensitive) from the computed changes.
+    - Returns (changes_list, total) where total is the sum of the diffs for the returned lines
+      (i.e., only the displayed lines are included in the total).
+    """
     # calculate diffs for brawlers present in either
-    names = set(prev_map.keys()) | set(curr_map.keys())
+    names = sorted(set(prev_map.keys()) | set(curr_map.keys()))
     changes = []
-    total = 0
-    for n in sorted(names):
+    included_diffs = []
+
+    for n in names:
+        if not n:
+            continue
+        # skip the synthetic total row (could be 'TOTAL' or other case variants)
+        if str(n).strip().upper() == 'TOTAL':
+            continue
+
         prev = prev_map.get(n, 0)
         curr = curr_map.get(n, 0)
         diff = curr - prev
         if diff != 0:
             sign = '+' if diff > 0 else ''
             changes.append(f"{n} {sign}{diff}")
-            total += diff
-            if len(changes) >= 24:
+            included_diffs.append(diff)
+            if len(changes) >= max_lines:
                 break
+
+    total = sum(included_diffs)
     return changes, total
 
 

@@ -4,9 +4,12 @@ export default function Page(){
   // default sort: Trophies descending
   const [data,setData] = useState([])
   const [trophyDiffs,setTrophyDiffs] = useState([])
+  const [historyCards, setHistoryCards] = useState([])
+  const [historyError, setHistoryError] = useState(false)
   const [sortKey,setSortKey] = useState('Trophies')
   const [dir,setDir] = useState(1)
   const [filter,setFilter] = useState('')
+  const [isMobile, setIsMobile] = useState(false)
 
   // Helper to capitalize first letter of each word and lowercase the rest; handles hyphenated names
   const capitalize = (s) => {
@@ -22,8 +25,11 @@ export default function Page(){
     Promise.all([
       fetch('/brawlers.json').then(r=>r.json()),
       fetch('/overrides.json').then(r=>r.json()).catch(()=>({})),
-      fetch('/brawlers.prev.json').then(r=>r.json()).catch(()=>null)
-    ]).then(([brows,ov,prev])=>{
+      fetch('/brawlers.prev.json').then(r=>r.json()).catch(()=>null),
+      fetch('/hourly_changes.json').then(r=>r.json()).catch(()=>[])
+    ]).then(([brows,ov,prev,history])=>{
+      // history is expected to be an array of cards; store for rendering
+      setHistoryCards(Array.isArray(history) ? history : [])
       const merged = brows.map(b => ({...b, ...(ov[b.Brawler]||{})}))
       setData(merged)
 
@@ -49,6 +55,38 @@ export default function Page(){
     })
   },[])
 
+  // Additional explicit fetch with logging to help debug visibility issues
+  useEffect(()=>{
+    fetch('/hourly_changes.json')
+      .then(r => {
+        if(!r.ok) throw new Error(`HTTP ${r.status}`)
+        return r.json()
+      })
+      .then(j => {
+        if(!Array.isArray(j)){
+          console.error('hourly_changes.json is not an array', j)
+          setHistoryCards([])
+          setHistoryError(true)
+          return
+        }
+        setHistoryCards(j)
+        setHistoryError(false)
+      })
+      .catch(err => {
+        console.error('Failed to load /hourly_changes.json:', err)
+        setHistoryCards([])
+        setHistoryError(true)
+      })
+  },[])
+
+  // Track viewport size for responsive layout tweaks
+  useEffect(()=>{
+    const update = ()=> setIsMobile(typeof window !== 'undefined' && window.innerWidth <= 720)
+    update()
+    window.addEventListener('resize', update)
+    return ()=> window.removeEventListener('resize', update)
+  },[])
+
   // exclude any rows that look like a total row (e.g. Brawler contains "total")
   const visible = data.filter(r=>{
     if(!r) return false
@@ -57,7 +95,22 @@ export default function Page(){
     return true
   })
 
-  const sorted = [...visible].filter(r=> JSON.stringify(r).toLowerCase().includes(filter.toLowerCase()))
+  // improved filter: search only table content (values) and the Brawler name — do NOT search column names
+  const query = (filter || '').trim().toLowerCase()
+  const filtered = query ? visible.filter(r => {
+    if(!r) return false
+    const bname = String(r.Brawler || '').toLowerCase()
+    if(bname.includes(query)) return true
+    try{
+      // Build search text from values only (exclude keys/column names)
+      const valuesText = Object.values(r).map(v => String(v ?? '')).join(' ').toLowerCase()
+      return valuesText.includes(query)
+    }catch(_){
+      return JSON.stringify(r).toLowerCase().includes(query)
+    }
+  }) : [...visible]
+
+  const sorted = filtered
   if(sortKey){
     sorted.sort((a,b)=>{
       // if sorting by Trophies itself, use that as primary key respecting dir
@@ -124,17 +177,18 @@ export default function Page(){
   }
 
   return (
-    <div style={{padding:20,fontFamily:'Arial',backgroundColor:'#eef8fb', minHeight: '100vh'}}>
-      <h1>Brawlers</h1>
+    <div style={{padding:16,fontFamily:'Arial',backgroundColor:'#eef8fb', minHeight: '100vh'}}>
       <div style={{marginBottom:10, display:'flex',gap:8,alignItems:'center'}}>
         <input placeholder="filter..." value={filter} onChange={e=>setFilter(e.target.value)} style={{width:160,padding:6}} aria-label="filter" />
         <button onClick={()=>{ setFilter(''); setSortKey('Trophies'); setDir(1); }} aria-label="Reset filter and sort" style={{padding:'6px 10px'}}>Reset</button>
       </div>
 
-      <div style={{display:'flex',alignItems:'flex-start',gap:20}}>
+      <div style={{display:'flex',flexDirection: isMobile ? 'column' : 'row',alignItems:'flex-start',gap:20}}>
         <div style={{flex:1}}>
-          <table border="1" cellPadding="6" style={{width:'100%',borderCollapse:'collapse'}}>
-            <thead>
+          <div style={{overflowX: 'auto'}}>
+            <table border="1" cellPadding="6" style={{width:'100%',borderCollapse:'collapse', minWidth: 720}}>
+            {/* minWidth keeps table readable on desktop but allows horizontal scroll on small screens */}
+             <thead>
               <tr>
                 <th>Brawler</th>
                 <th style={{whiteSpace:'nowrap'}}>
@@ -183,16 +237,17 @@ export default function Page(){
               ))}
             </tbody>
           </table>
+          </div>
         </div>
 
-        <div style={{width:380, display:'flex', flexDirection:'column', gap:12, alignSelf:'flex-start'}}>
+        <div style={{width: isMobile ? '100%' : 380, display:'flex', flexDirection:'column', gap:12, alignSelf:'flex-start', marginTop: isMobile ? 12 : 0}}>
           <div style={{height:150, position:'relative', boxShadow:'0 6px 18px rgba(16,24,40,0.08)', border:'1px solid rgba(0,0,0,0.06)', borderRadius:8, overflow:'hidden'}}>
             {/* Photo placed inside the card (semi-transparent) so it is the card background and cannot overflow */}
             <img src="/IMG_20250815_225636.jpg" alt="" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',opacity:0.5,pointerEvents:'none'}} />
 
             {/* Text content sits above the photo; no full white box so photo is visible through the card */}
             <div style={{position:'relative', padding:12, color:'#000', textShadow:'0 1px 0 rgba(255,255,255,0.6)'}}>
-              <h3 style={{marginTop:0}}>Summary</h3>
+              <h3 style={{marginTop:0,fontSize: isMobile ? 16 : 18}}>Summary</h3>
               <div style={{display:'flex',justifyContent:'space-between',marginBottom:6}}>
                 <div>Total Trophies:</div>
                 <div style={{fontWeight:'bold'}}>{totalTrophies}</div>
@@ -207,6 +262,30 @@ export default function Page(){
               </div>
             </div>
           </div>
+
+          {/* Show latest hourly change card if available */}
+          {historyCards && historyCards.length>0 ? (
+            <div style={{boxShadow:'0 6px 18px rgba(16,24,40,0.08)', border:'1px solid rgba(0,0,0,0.06)', borderRadius:8, padding:12, backgroundColor:'#fff'}}>
+              <h4 style={{marginTop:0}}>Latest changes</h4>
+              <div style={{fontSize:13, marginBottom:8, color:'#666'}}>{historyCards[0].timestamp}</div>
+              <div>
+                {historyCards[0].lines && historyCards[0].lines.map((L,i)=> (
+                  <div key={i} style={{display:'flex',justifyContent:'space-between'}}>
+                    <div>{L.split(' ')[0]}</div>
+                    <div style={{color: L.includes('+') ? 'green' : 'red'}}>{L.split(' ').slice(1).join(' ')}</div>
+                  </div>
+                ))}
+              </div>
+              <div style={{borderTop:'1px solid rgba(0,0,0,0.06)', marginTop:8, paddingTop:8, display:'flex', justifyContent:'space-between', fontWeight:'bold'}}>
+                <div>TOTAL</div>
+                <div style={{color: historyCards[0].total>0 ? 'green' : historyCards[0].total<0 ? 'red' : 'inherit'}}>{historyCards[0].total>0?`+${historyCards[0].total}`:historyCards[0].total}</div>
+              </div>
+            </div>
+          ) : (
+            <div style={{boxShadow:'0 6px 18px rgba(16,24,40,0.04)', border:'1px dashed rgba(0,0,0,0.04)', borderRadius:8, padding:12, backgroundColor:'#fff'}}>
+              <div style={{color: historyError ? 'red' : '#666'}}> {historyError ? 'Could not load hourly_changes.json — check console/network' : 'No hourly changes available'}</div>
+            </div>
+          )}
 
           {trophyDiffs && trophyDiffs.length>0 && (
             <div style={{boxShadow:'0 6px 18px rgba(16,24,40,0.08)', border:'1px solid rgba(0,0,0,0.06)', borderRadius:8, padding:12, backgroundColor:'#fff'}}>
