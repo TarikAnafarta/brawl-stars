@@ -298,7 +298,7 @@ export default function Page(){
           {/* Show latest hourly change card if available */}
           {historyCards && historyCards.length>0 ? (
             <div style={{boxShadow:isMobile ? '0 6px 18px rgba(16,24,40,0.06)' : '0 10px 28px rgba(16,24,40,0.12)', border:'1px solid rgba(0,0,0,0.08)', borderRadius:8, padding:12, backgroundColor:'#e8f3fb'}}>
-              <h4 style={{marginTop:0}}>Recent hourly changes (most recent 24)</h4>
+              <h4 style={{marginTop:0}}>Recent trophy changes (most recent 24)</h4>
               <div style={{maxHeight:220, overflowY:'auto', paddingRight:6, display:'flex', flexDirection:'column', gap:10}}>
                 {historyCards.map((card,ci)=>(
                   <div key={ci} style={{padding:10, borderRadius:8, backgroundColor:isMobile? '#dceffb' : '#cfeafc', boxShadow:'inset 0 0 0 1px rgba(0,0,0,0.03)'}}>
