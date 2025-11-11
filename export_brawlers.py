@@ -14,6 +14,8 @@ from zoneinfo import ZoneInfo
 # Trim whitespace and allow TAG to be provided with or without a leading '#'
 API_KEY = os.environ.get('BRAWL_API_KEY', '').strip()
 TAG = os.environ.get('BRAWL_TAG', '').strip().lstrip('#')
+# Optional: override API base (useful to switch between official API and the RoyaleAPI proxy)
+PROXY_BASE = os.environ.get('BRAWL_PROXY_BASE', 'https://bsproxy.royaleapi.dev').strip().rstrip('/')
 OUTPUT_JSON = os.environ.get('OUTPUT_JSON') or 'frontend/public/brawlers.json'
 HISTORY_JSON = os.path.join(os.path.dirname(OUTPUT_JSON), 'hourly_changes.json')
 HISTORY_MAX = 24
@@ -66,7 +68,7 @@ def points_and_coins_to_max_for_power(power):
 
 
 def fetch_player_from_brawlstars(tag, api_key, timeout=20):
-    """Fetch player JSON from the official Brawl Stars API using the provided API key.
+    """Fetch player JSON from the official Brawl Stars API or a proxy using the provided API key.
     The player tag may be provided with or without the leading '#'.
 
     Returns parsed JSON dict on success or raises an exception on error.
@@ -76,7 +78,8 @@ def fetch_player_from_brawlstars(tag, api_key, timeout=20):
 
     # Ensure tag is safe for use in a URL; the API expects the tag to be prefixed with '%23' (encoded '#')
     safe_tag = urllib.parse.quote(tag, safe='')
-    url = f'https://proxy.royaleapi.dev/v1/players/%23{safe_tag}'
+    base = PROXY_BASE or 'https://bsproxy.royaleapi.dev'
+    url = f"{base}/v1/players/%23{safe_tag}"
     headers = {
         'Authorization': f'Bearer {api_key}',
         'Accept': 'application/json',
@@ -99,7 +102,7 @@ def fetch_player_from_brawlstars(tag, api_key, timeout=20):
             raise RuntimeError(
                 f'Brawl Stars API returned {status} (Unauthorized/Forbidden).\n'
                 'Possible causes: invalid API key, missing permissions, or API key not available to this runner.\n'
-                'Ensure repository secret BRAWL_API_KEY exists and the workflow exposes it via env.'
+                'If using the RoyaleAPI proxy, ensure you have whitelisted the proxy IP (45.79.218.79) in your Supercell dev console.'
             ) from e
         raise
 
@@ -201,6 +204,9 @@ def main():
         print('Error: BRAWL_TAG environment variable is not set or is empty.')
         print('Set it in your environment or GitHub Actions secrets as BRAWL_TAG (without the leading #).')
         sys.exit(2)
+
+    # show which API base will be used (helps with debugging proxy vs official API)
+    print(f'Using API base: {PROXY_BASE}')
 
     # fetch current data from API
     try:
