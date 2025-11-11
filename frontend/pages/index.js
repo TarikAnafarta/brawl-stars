@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import Head from 'next/head'
 
 export default function Page(){
   // default sort: Trophies descending
@@ -209,143 +210,162 @@ export default function Page(){
   }
 
   return (
-    <div style={{padding:16,fontFamily:'Arial',backgroundColor: isMobile ? '#ffffff' : '#eef8fb', minHeight: '100vh'}}>
-      <div style={{marginBottom:10, display:'flex',gap:8,alignItems:'center'}}>
-        <input placeholder="filter..." value={filter} onChange={e=>setFilter(e.target.value)} style={{width:160,padding:6}} aria-label="filter" />
-        <button onClick={()=>{ setFilter(''); setSortKey('Trophies'); setDir(1); }} aria-label="Reset filter and sort" style={{padding:'6px 10px'}}>Reset</button>
-      </div>
+    <>
+      <Head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </Head>
+      <div className="page" style={{padding:16,fontFamily:'Arial'}}>
+        <div style={{marginBottom:10, display:'flex',gap:8,alignItems:'center'}}>
+          <input placeholder="filter..." value={filter} onChange={e=>setFilter(e.target.value)} style={{width:160,padding:6}} aria-label="filter" />
+          <button onClick={()=>{ setFilter(''); setSortKey('Trophies'); setDir(1); }} aria-label="Reset filter and sort" style={{padding:'6px 10px'}}>Reset</button>
+        </div>
 
-      <div style={{display:'flex',flexDirection: isMobile ? 'column' : 'row',alignItems:'flex-start',gap:20}}>
-        <div style={{flex:1}}>
-          <div style={{overflowX: 'auto'}}>
-            <table border="1" cellPadding="6" style={{width:'100%',borderCollapse:'collapse', minWidth: isMobile ? 520 : 720}}>
-            {/* minWidth keeps table readable on desktop but allows horizontal scroll on small screens */}
-             <thead>
-              <tr>
-                <th>Brawler</th>
-                <th style={{whiteSpace:'nowrap'}}>
-                  Power {isSortable('Power') && (
-                    <button onClick={()=>toggleSort('Power')} aria-label="Sort by Power" style={{marginLeft:6,padding:'2px 6px',fontSize:12}}>{sortIcon('Power')}</button>
-                  )}
-                </th>
-                <th style={{whiteSpace:'nowrap'}}>
-                  Trophies {isSortable('Trophies') && (
-                    <button onClick={()=>toggleSort('Trophies')} aria-label="Sort by Trophies" style={{marginLeft:6,padding:'2px 6px',fontSize:12}}>{sortIcon('Trophies')}</button>
-                  )}
-                </th>
-                <th style={{whiteSpace:'nowrap'}}>
-                  Hypercharge {isSortable('Hypercharge') && (
-                    <button onClick={()=>toggleSort('Hypercharge')} aria-label="Sort by Hypercharge" style={{marginLeft:6,padding:'2px 6px',fontSize:12}}>{sortIcon('Hypercharge')}</button>
-                  )}
-                </th>
-                <th>Star Powers</th>
-                <th>Gadgets</th>
-                <th>Gears</th>
-                <th style={{whiteSpace:'nowrap'}}>
-                  Points to MAX {isSortable('Points to MAX') && (
-                    <button onClick={()=>toggleSort('Points to MAX')} aria-label="Sort by Points to MAX" style={{marginLeft:6,padding:'2px 6px',fontSize:12}}>{sortIcon('Points to MAX')}</button>
-                  )}
-                </th>
-                <th style={{whiteSpace:'nowrap'}}>
-                  Coins to MAX {isSortable('Coins to MAX') && (
-                    <button onClick={()=>toggleSort('Coins to MAX')} aria-label="Sort by Coins to MAX" style={{marginLeft:6,padding:'2px 6px',fontSize:12}}>{sortIcon('Coins to MAX')}</button>
-                  )}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {sorted.map((r,i)=>(
-                <tr key={i}>
-                  <td>{capitalize(r.Brawler)}</td>
-                  <td style={{backgroundColor: getPowerBg(r), color: '#000'}}>{r.Power}</td>
-                  <td>{r.Trophies}</td>
-                  <td>{r.Hypercharge}</td>
-                  <td>{r['Star Powers']}</td>
-                  <td>{r.Gadgets}</td>
-                  <td>{r.Gears}</td>
-                  <td>{r['Points to MAX']}</td>
-                  <td>{r['Coins to MAX']}</td>
+        <div style={{display:'flex',flexDirection: isMobile ? 'column' : 'row',alignItems:'flex-start',gap:20}}>
+          <div style={{flex:1}}>
+            <div style={{overflowX: 'auto'}}>
+              <table border="1" cellPadding="6" style={{width:'100%',borderCollapse:'collapse', minWidth: isMobile ? 460 : 720}}>
+              {/* minWidth keeps table readable on desktop but allows horizontal scroll on small screens */}
+               <thead>
+                <tr>
+                  <th>Brawler</th>
+                  <th style={{whiteSpace:'nowrap'}}>
+                    Power {isSortable('Power') && (
+                      <button onClick={()=>toggleSort('Power')} aria-label="Sort by Power" style={{marginLeft:6,padding:'2px 6px',fontSize:12}}>{sortIcon('Power')}</button>
+                    )}
+                  </th>
+                  <th style={{whiteSpace:'nowrap'}}>
+                    Trophies {isSortable('Trophies') && (
+                      <button onClick={()=>toggleSort('Trophies')} aria-label="Sort by Trophies" style={{marginLeft:6,padding:'2px 6px',fontSize:12}}>{sortIcon('Trophies')}</button>
+                    )}
+                  </th>
+                  <th style={{whiteSpace:'nowrap'}}>
+                    Hypercharge {isSortable('Hypercharge') && (
+                      <button onClick={()=>toggleSort('Hypercharge')} aria-label="Sort by Hypercharge" style={{marginLeft:6,padding:'2px 6px',fontSize:12}}>{sortIcon('Hypercharge')}</button>
+                    )}
+                  </th>
+                  <th>
+                    <span className="stacked"><span>Star</span><span>Powers</span></span>
+                  </th>
+                  <th>Gadgets</th>
+                  <th>Gears</th>
+                  <th>
+                    <span className="stacked"><span>Points</span><span>to</span><span>MAX</span></span>
+                    {isSortable('Points to MAX') && (
+                      <button onClick={()=>toggleSort('Points to MAX')} aria-label="Sort by Points to MAX" style={{marginLeft:6,padding:'2px 6px',fontSize:12}}>{sortIcon('Points to MAX')}</button>
+                    )}
+                  </th>
+                  <th>
+                    <span className="stacked"><span>Coins</span><span>to</span><span>MAX</span></span>
+                    {isSortable('Coins to MAX') && (
+                      <button onClick={()=>toggleSort('Coins to MAX')} aria-label="Sort by Coins to MAX" style={{marginLeft:6,padding:'2px 6px',fontSize:12}}>{sortIcon('Coins to MAX')}</button>
+                    )}
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-          </div>
-        </div>
-
-        <div style={{width: isMobile ? '100%' : 380, display:'flex', flexDirection:'column', gap:12, alignSelf:'flex-start', marginTop: isMobile ? 12 : 0}}>
-          <div style={{height: isMobile ? 120 : 150, position:'relative', boxShadow:isMobile ? '0 6px 14px rgba(16,24,40,0.12)' : '0 8px 24px rgba(16,24,40,0.12)', border:isMobile ? '1px solid rgba(0,0,0,0.06)' : '1px solid rgba(0,0,0,0.08)', borderRadius:8, overflow:'hidden'}}>
-            {/* Photo placed inside the card (semi-transparent) so it is the card background and cannot overflow */}
-            <img src="/IMG_20250815_225636.jpg" alt="" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',opacity:isMobile?0.45:0.55,pointerEvents:'none'}} />
-
-            {/* Text content sits above the photo; no full white box so photo is visible through the card */}
-            <div style={{position:'relative', padding:12, color:isMobile? '#000' : '#000', textShadow:isMobile? 'none' : '0 1px 0 rgba(255,255,255,0.6)'}}>
-              <h3 style={{marginTop:0,fontSize: isMobile ? 15 : 18}}>Summary</h3>
-              <div style={{display:'flex',justifyContent:'space-between',marginBottom:6}}>
-                <div>Total Trophies:</div>
-                <div style={{fontWeight:'bold'}}>{totalTrophies}</div>
-              </div>
-              <div style={{display:'flex',justifyContent:'space-between',marginBottom:6}}>
-                <div>Points to MAX:</div>
-                <div style={{fontWeight:'bold'}}>{totalPointsToMax}</div>
-              </div>
-              <div style={{display:'flex',justifyContent:'space-between'}}>
-                <div>Coins to MAX:</div>
-                <div style={{fontWeight:'bold'}}>{totalCoinsToMax}</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Show latest hourly change card if available */}
-          {historyCards && historyCards.length>0 ? (
-            <div style={{boxShadow:isMobile ? '0 6px 18px rgba(16,24,40,0.06)' : '0 10px 28px rgba(16,24,40,0.12)', border:'1px solid rgba(0,0,0,0.08)', borderRadius:8, padding:12, backgroundColor:'#e8f3fb'}}>
-              <h4 style={{marginTop:0}}>Recent trophy changes (most recent 24)</h4>
-              <div style={{maxHeight:220, overflowY:'auto', paddingRight:6, display:'flex', flexDirection:'column', gap:10}}>
-                {historyCards.map((card,ci)=>(
-                  <div key={ci} style={{padding:10, borderRadius:8, backgroundColor:isMobile? '#dceffb' : '#cfeafc', boxShadow:'inset 0 0 0 1px rgba(0,0,0,0.03)'}}>
-                    <div style={{fontSize:13, marginBottom:6, color:'#666'}}>{card.timestamp}</div>
-                    <div>
-                      {card.lines && card.lines.map((L,i)=> (
-                        <div key={i} style={{display:'flex',justifyContent:'space-between'}}>
-                          <div>{L.split(' ')[0]}</div>
-                          <div style={{color: L.includes('+') ? 'green' : L.includes('-') ? 'red' : 'inherit'}}>{L.split(' ').slice(1).join(' ')}</div>
-                        </div>
-                      ))}
-                    </div>
-                    <div style={{display:'flex', justifyContent:'space-between', fontWeight:'bold', marginTop:6}}>
-                      <div>TOTAL</div>
-                      <div style={{color: card.total>0 ? 'green' : card.total<0 ? 'red' : 'inherit'}}>{card.total>0?`+${card.total}`:card.total}</div>
-                    </div>
-                  </div>
+              </thead>
+              <tbody>
+                {sorted.map((r,i)=>(
+                  <tr key={i}>
+                    <td>{capitalize(r.Brawler)}</td>
+                    <td style={{backgroundColor: getPowerBg(r), color: '#000'}}>{r.Power}</td>
+                    <td>{r.Trophies}</td>
+                    <td>{r.Hypercharge}</td>
+                    <td>{r['Star Powers']}</td>
+                    <td>{r.Gadgets}</td>
+                    <td>{r.Gears}</td>
+                    <td>{r['Points to MAX']}</td>
+                    <td>{r['Coins to MAX']}</td>
+                  </tr>
                 ))}
+              </tbody>
+            </table>
+            </div>
+          </div>
+
+          <div style={{width: isMobile ? '100%' : 380, display:'flex', flexDirection:'column', gap:12, alignSelf:'flex-start', marginTop: isMobile ? 12 : 0}}>
+            <div style={{height: isMobile ? 120 : 150, position:'relative', boxShadow:isMobile ? '0 6px 14px rgba(16,24,40,0.12)' : '0 8px 24px rgba(16,24,40,0.12)', border:isMobile ? '1px solid rgba(0,0,0,0.06)' : '1px solid rgba(0,0,0,0.08)', borderRadius:8, overflow:'hidden'}}>
+              {/* Photo placed inside the card (semi-transparent) so it is the card background and cannot overflow */}
+              <img src="/IMG_20250815_225636.jpg" alt="" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',opacity:isMobile?0.45:0.55,pointerEvents:'none'}} />
+
+              {/* Text content sits above the photo; no full white box so photo is visible through the card */}
+              <div style={{position:'relative', padding:12, color:isMobile? '#000' : '#000', textShadow:isMobile? 'none' : '0 1px 0 rgba(255,255,255,0.6)'}}>
+                <h3 style={{marginTop:0,fontSize: isMobile ? 15 : 18}}>Summary</h3>
+                <div style={{display:'flex',justifyContent:'space-between',marginBottom:6}}>
+                  <div>Total Trophies:</div>
+                  <div style={{fontWeight:'bold'}}>{totalTrophies}</div>
+                </div>
+                <div style={{display:'flex',justifyContent:'space-between',marginBottom:6}}>
+                  <div>Points to MAX:</div>
+                  <div style={{fontWeight:'bold'}}>{totalPointsToMax}</div>
+                </div>
+                <div style={{display:'flex',justifyContent:'space-between'}}>
+                  <div>Coins to MAX:</div>
+                  <div style={{fontWeight:'bold'}}>{totalCoinsToMax}</div>
+                </div>
               </div>
             </div>
-          ) : (
-            <div style={{boxShadow:'0 6px 18px rgba(16,24,40,0.04)', border:'1px dashed rgba(0,0,0,0.04)', borderRadius:8, padding:12, backgroundColor:'#fff'}}>
-              <div style={{color: historyError ? 'red' : '#666'}}> {historyError ? 'Could not load hourly_changes.json — check console/network' : 'No hourly changes available'}</div>
-            </div>
-          )}
 
-          {trophyDiffs && trophyDiffs.length>0 && (
-            <div style={{boxShadow:'0 6px 18px rgba(16,24,40,0.08)', border:'1px solid rgba(0,0,0,0.06)', borderRadius:8, padding:12, backgroundColor:'#fff'}}>
-              <h4 style={{marginTop:0}}>Trophy changes (since last fetch)</h4>
-              <div>
-                {trophyDiffs.map((d,i)=>(
-                   <div key={i} style={{display:'flex',justifyContent:'space-between',fontSize:13}}>
-                    <div>{capitalize(d.Brawler)}</div>
-                     <div style={{color: d.delta>0 ? 'green' : 'red'}}>{d.delta>0?`+${d.delta}`:d.delta}</div>
-                   </div>
-                 ))}
+            {/* Show latest hourly change card if available */}
+            {historyCards && historyCards.length>0 ? (
+              <div style={{boxShadow:isMobile ? '0 6px 18px rgba(16,24,40,0.06)' : '0 10px 28px rgba(16,24,40,0.12)', border:'1px solid rgba(0,0,0,0.08)', borderRadius:8, padding:12, backgroundColor:'#e8f3fb'}}>
+                <h4 style={{marginTop:0}}>Recent trophy changes (most recent 24)</h4>
+                <div style={{paddingRight:6, display:'flex', flexDirection:'column', gap:10}}>
+                  {historyCards.map((card,ci)=>(
+                    <div key={ci} style={{padding:10, borderRadius:8, backgroundColor:isMobile? '#dceffb' : '#cfeafc', boxShadow:'inset 0 0 0 1px rgba(0,0,0,0.03)'}}>
+                      <div style={{fontSize:13, marginBottom:6, color:'#666'}}>{card.timestamp}</div>
+                      <div>
+                        {card.lines && card.lines.map((L,i)=> (
+                          <div key={i} style={{display:'flex',justifyContent:'space-between'}}>
+                            <div>{L.split(' ')[0]}</div>
+                            <div style={{color: L.includes('+') ? 'green' : L.includes('-') ? 'red' : 'inherit'}}>{L.split(' ').slice(1).join(' ')}</div>
+                          </div>
+                        ))}
+                      </div>
+                      <div style={{display:'flex', justifyContent:'space-between', fontWeight:'bold', marginTop:6}}>
+                        <div>TOTAL</div>
+                        <div style={{color: card.total>0 ? 'green' : card.total<0 ? 'red' : 'inherit'}}>{card.total>0?`+${card.total}`:card.total}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-
-              <div style={{borderTop:'1px solid rgba(0,0,0,0.06)', marginTop:8, paddingTop:8, display:'flex', justifyContent:'space-between', fontWeight:'bold'}}>
-                <div>TOTAL</div>
-                <div style={{color: totalDelta>0 ? 'green' : totalDelta<0 ? 'red' : 'inherit'}}>{totalDelta>0?`+${totalDelta}`:totalDelta}</div>
+            ) : (
+              <div style={{boxShadow:'0 6px 18px rgba(16,24,40,0.04)', border:'1px dashed rgba(0,0,0,0.04)', borderRadius:8, padding:12, backgroundColor:'#fff'}}>
+                <div style={{color: historyError ? 'red' : '#666'}}> {historyError ? 'Could not load hourly_changes.json — check console/network' : 'No hourly changes available'}</div>
               </div>
-            </div>
-          )}
+            )}
 
+            {trophyDiffs && trophyDiffs.length>0 && (
+              <div style={{boxShadow:'0 6px 18px rgba(16,24,40,0.08)', border:'1px solid rgba(0,0,0,0.06)', borderRadius:8, padding:12, backgroundColor:'#fff'}}>
+                <h4 style={{marginTop:0}}>Trophy changes (since last fetch)</h4>
+                <div>
+                  {trophyDiffs.map((d,i)=>(
+                     <div key={i} style={{display:'flex',justifyContent:'space-between',fontSize:13}}>
+                      <div>{capitalize(d.Brawler)}</div>
+                       <div style={{color: d.delta>0 ? 'green' : 'red'}}>{d.delta>0?`+${d.delta}`:d.delta}</div>
+                     </div>
+                   ))}
+                </div>
+
+                <div style={{borderTop:'1px solid rgba(0,0,0,0.06)', marginTop:8, paddingTop:8, display:'flex', justifyContent:'space-between', fontWeight:'bold'}}>
+                  <div>TOTAL</div>
+                  <div style={{color: totalDelta>0 ? 'green' : totalDelta<0 ? 'red' : 'inherit'}}>{totalDelta>0?`+${totalDelta}`:totalDelta}</div>
+                </div>
+              </div>
+            )}
+
+          </div>
         </div>
       </div>
-    </div>
+
+      <style jsx>{`
+        .page{ background:#eef8fb; min-height:100vh; min-height:100dvh; }
+        .stacked span{ display:inline; }
+        @media (max-width: 720px){
+          .page{ background:#ffffff; }
+          th, td{ font-size:14px; }
+          .stacked span{ display:block; line-height:1.05; }
+        }
+      `}</style>
+    </>
   )
 }
