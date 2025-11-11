@@ -2,7 +2,7 @@ name: Hourly Brawl Export
 
 on:
   schedule:
-    - cron: '0 * * * *'  # at minute 0 of every hour
+    - cron: '59 * * * *'  # at minute 59 of every hour
   workflow_dispatch: {}
 
 permissions:
@@ -38,7 +38,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add frontend/public/brawlers.json frontend/public/hourly_changes.json || true
           if [ -n "$(git status --porcelain)" ]; then
-            git commit -m "chore: hourly update brawlers and history [skip ci]" || true
+            git commit -m "chore: hourly update brawlers and history" || true
             git push
           else
             echo "No changes to commit"

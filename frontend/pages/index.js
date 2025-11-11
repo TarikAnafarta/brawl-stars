@@ -21,6 +21,37 @@ export default function Page(){
     ).join(' ')
   }
 
+  // Parse timestamps like "2025-11-12 00:01 +03" into Date objects
+  const parseTimestamp = (ts) => {
+    if(!ts) return null
+    try{
+      const str = String(ts).trim()
+      // match YYYY-MM-DD HH:MM [±HH[:MM]]
+      const m = str.match(/^(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2})(?:\s*([+\-]\d{1,2})(?::?(\d{2}))?)?$/)
+      if(!m) return new Date(str)
+      const date = m[1], time = m[2], offHour = m[3], offMin = m[4] || '00'
+      let offset = '+00'
+      if(offHour){
+        // normalize hour offset to two digits, e.g. +3 -> +03
+        offset = offHour[0] + offHour.slice(1).padStart(2,'0')
+      }
+      const iso = `${date}T${time}:00${offset}:${offMin}`
+      const d = new Date(iso)
+      if(isNaN(d)) return new Date(str)
+      return d
+    }catch(e){
+      return new Date(ts)
+    }
+  }
+
+  // Keep only the 24 most-recent entries (by parsed timestamp), newest-first
+  const getMostRecentEntries = (arr) => {
+    if(!Array.isArray(arr)) return []
+    const withDates = arr.map(item => ({...item, _tsDate: parseTimestamp(item?.timestamp)})).filter(x=>x && x._tsDate && !isNaN(x._tsDate))
+    withDates.sort((a,b)=> b._tsDate - a._tsDate)
+    return withDates.slice(0,24)
+  }
+
   useEffect(()=>{ 
     Promise.all([
       fetch('/brawlers.json').then(r=>r.json()),
@@ -29,7 +60,7 @@ export default function Page(){
       fetch('/hourly_changes.json').then(r=>r.json()).catch(()=>[])
     ]).then(([brows,ov,prev,history])=>{
       // history is expected to be an array of cards; store for rendering
-      setHistoryCards(Array.isArray(history) ? history : [])
+      setHistoryCards(Array.isArray(history) ? getMostRecentEntries(history) : [])
       const merged = brows.map(b => ({...b, ...(ov[b.Brawler]||{})}))
       setData(merged)
 
@@ -69,7 +100,8 @@ export default function Page(){
           setHistoryError(true)
           return
         }
-        setHistoryCards(j)
+        // keep only the last 24 hours of hourly changes (newest first)
+        setHistoryCards(getMostRecentEntries(j))
         setHistoryError(false)
       })
       .catch(err => {
@@ -177,7 +209,7 @@ export default function Page(){
   }
 
   return (
-    <div style={{padding:16,fontFamily:'Arial',backgroundColor:'#eef8fb', minHeight: '100vh'}}>
+    <div style={{padding:16,fontFamily:'Arial',backgroundColor: isMobile ? '#ffffff' : '#eef8fb', minHeight: '100vh'}}>
       <div style={{marginBottom:10, display:'flex',gap:8,alignItems:'center'}}>
         <input placeholder="filter..." value={filter} onChange={e=>setFilter(e.target.value)} style={{width:160,padding:6}} aria-label="filter" />
         <button onClick={()=>{ setFilter(''); setSortKey('Trophies'); setDir(1); }} aria-label="Reset filter and sort" style={{padding:'6px 10px'}}>Reset</button>
@@ -186,7 +218,7 @@ export default function Page(){
       <div style={{display:'flex',flexDirection: isMobile ? 'column' : 'row',alignItems:'flex-start',gap:20}}>
         <div style={{flex:1}}>
           <div style={{overflowX: 'auto'}}>
-            <table border="1" cellPadding="6" style={{width:'100%',borderCollapse:'collapse', minWidth: 720}}>
+            <table border="1" cellPadding="6" style={{width:'100%',borderCollapse:'collapse', minWidth: isMobile ? 520 : 720}}>
             {/* minWidth keeps table readable on desktop but allows horizontal scroll on small screens */}
              <thead>
               <tr>
@@ -241,13 +273,13 @@ export default function Page(){
         </div>
 
         <div style={{width: isMobile ? '100%' : 380, display:'flex', flexDirection:'column', gap:12, alignSelf:'flex-start', marginTop: isMobile ? 12 : 0}}>
-          <div style={{height:150, position:'relative', boxShadow:'0 6px 18px rgba(16,24,40,0.08)', border:'1px solid rgba(0,0,0,0.06)', borderRadius:8, overflow:'hidden'}}>
+          <div style={{height: isMobile ? 120 : 150, position:'relative', boxShadow:isMobile ? '0 6px 14px rgba(16,24,40,0.12)' : '0 8px 24px rgba(16,24,40,0.12)', border:isMobile ? '1px solid rgba(0,0,0,0.06)' : '1px solid rgba(0,0,0,0.08)', borderRadius:8, overflow:'hidden'}}>
             {/* Photo placed inside the card (semi-transparent) so it is the card background and cannot overflow */}
-            <img src="/IMG_20250815_225636.jpg" alt="" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',opacity:0.5,pointerEvents:'none'}} />
+            <img src="/IMG_20250815_225636.jpg" alt="" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',opacity:isMobile?0.45:0.55,pointerEvents:'none'}} />
 
             {/* Text content sits above the photo; no full white box so photo is visible through the card */}
-            <div style={{position:'relative', padding:12, color:'#000', textShadow:'0 1px 0 rgba(255,255,255,0.6)'}}>
-              <h3 style={{marginTop:0,fontSize: isMobile ? 16 : 18}}>Summary</h3>
+            <div style={{position:'relative', padding:12, color:isMobile? '#000' : '#000', textShadow:isMobile? 'none' : '0 1px 0 rgba(255,255,255,0.6)'}}>
+              <h3 style={{marginTop:0,fontSize: isMobile ? 15 : 18}}>Summary</h3>
               <div style={{display:'flex',justifyContent:'space-between',marginBottom:6}}>
                 <div>Total Trophies:</div>
                 <div style={{fontWeight:'bold'}}>{totalTrophies}</div>
@@ -265,20 +297,26 @@ export default function Page(){
 
           {/* Show latest hourly change card if available */}
           {historyCards && historyCards.length>0 ? (
-            <div style={{boxShadow:'0 6px 18px rgba(16,24,40,0.08)', border:'1px solid rgba(0,0,0,0.06)', borderRadius:8, padding:12, backgroundColor:'#fff'}}>
-              <h4 style={{marginTop:0}}>Latest changes</h4>
-              <div style={{fontSize:13, marginBottom:8, color:'#666'}}>{historyCards[0].timestamp}</div>
-              <div>
-                {historyCards[0].lines && historyCards[0].lines.map((L,i)=> (
-                  <div key={i} style={{display:'flex',justifyContent:'space-between'}}>
-                    <div>{L.split(' ')[0]}</div>
-                    <div style={{color: L.includes('+') ? 'green' : 'red'}}>{L.split(' ').slice(1).join(' ')}</div>
+            <div style={{boxShadow:isMobile ? '0 6px 18px rgba(16,24,40,0.06)' : '0 10px 28px rgba(16,24,40,0.12)', border:'1px solid rgba(0,0,0,0.08)', borderRadius:8, padding:12, backgroundColor:'#e8f3fb'}}>
+              <h4 style={{marginTop:0}}>Recent hourly changes (most recent 24)</h4>
+              <div style={{maxHeight:220, overflowY:'auto', paddingRight:6, display:'flex', flexDirection:'column', gap:10}}>
+                {historyCards.map((card,ci)=>(
+                  <div key={ci} style={{padding:10, borderRadius:8, backgroundColor:isMobile? '#dceffb' : '#cfeafc', boxShadow:'inset 0 0 0 1px rgba(0,0,0,0.03)'}}>
+                    <div style={{fontSize:13, marginBottom:6, color:'#666'}}>{card.timestamp}</div>
+                    <div>
+                      {card.lines && card.lines.map((L,i)=> (
+                        <div key={i} style={{display:'flex',justifyContent:'space-between'}}>
+                          <div>{L.split(' ')[0]}</div>
+                          <div style={{color: L.includes('+') ? 'green' : L.includes('-') ? 'red' : 'inherit'}}>{L.split(' ').slice(1).join(' ')}</div>
+                        </div>
+                      ))}
+                    </div>
+                    <div style={{display:'flex', justifyContent:'space-between', fontWeight:'bold', marginTop:6}}>
+                      <div>TOTAL</div>
+                      <div style={{color: card.total>0 ? 'green' : card.total<0 ? 'red' : 'inherit'}}>{card.total>0?`+${card.total}`:card.total}</div>
+                    </div>
                   </div>
                 ))}
-              </div>
-              <div style={{borderTop:'1px solid rgba(0,0,0,0.06)', marginTop:8, paddingTop:8, display:'flex', justifyContent:'space-between', fontWeight:'bold'}}>
-                <div>TOTAL</div>
-                <div style={{color: historyCards[0].total>0 ? 'green' : historyCards[0].total<0 ? 'red' : 'inherit'}}>{historyCards[0].total>0?`+${historyCards[0].total}`:historyCards[0].total}</div>
               </div>
             </div>
           ) : (

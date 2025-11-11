@@ -202,10 +202,15 @@ def format_changes(prev_map, curr_map, max_lines=24):
 
 
 def current_turkey_timestamp():
-    """Return the current timestamp in Turkey timezone."""
+    """Return the current timestamp in Turkey timezone formatted as:
+    YYYY-MM-DD HH:MM ±HH  (e.g. 2025-11-12 00:01 +03)
+    """
     tz = ZoneInfo('Europe/Istanbul')
     now = datetime.now(tz)
-    return now.strftime('%Y-%m-%d %H:%M %Z')
+    # %z gives offset like +0300 — trim last two digits to produce +03
+    offset = now.strftime('%z') or '+0000'
+    off_short = offset[:-2] if len(offset) >= 3 else offset
+    return now.strftime('%Y-%m-%d %H:%M') + ' ' + off_short
 
 
 def main():
@@ -273,17 +278,20 @@ def main():
         'total': total_diff
     }
 
-    # load existing history, prepend new card, trim to HISTORY_MAX
-    history = load_json_safe(HISTORY_JSON) or []
-    history.insert(0, card)
-    if len(history) > HISTORY_MAX:
-        history = history[:HISTORY_MAX]
-
     # write outputs
     save_json_safe(OUTPUT_JSON, merged_records)
-    save_json_safe(HISTORY_JSON, history)
 
-    print(f'Saved: {OUTPUT_JSON} and updated history with timestamp {timestamp}')
+    # Only update history if there were trophy changes; never delete older entries
+    if card_lines and len(card_lines) > 0:
+        history = load_json_safe(HISTORY_JSON) or []
+        history.insert(0, card)
+        # do NOT trim history here; keep all historical entries
+        save_json_safe(HISTORY_JSON, history)
+        print(f'Updated history with timestamp {timestamp}')
+    else:
+        print('No trophy changes since last export; history not updated.')
+
+    print(f'Saved: {OUTPUT_JSON}')
 
 
 if __name__ == '__main__':
