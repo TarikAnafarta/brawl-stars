@@ -14,9 +14,6 @@ env/
 .env.*
 .envrc
 
-# Project-specific downloads and inputs
-22PLQCR29
-
 # IDEs
 .vscode/
 .idea/
@@ -31,21 +28,30 @@ Thumbs.db
 # pytest
 .pytest_cache/
 
-# Playwright cache
-.playwright/
-
-# Node / Frontend
-frontend/node_modules/
-frontend/.next/
-frontend/.vercel/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
 # Logs
 *.log
 
 # Mac/Windows hidden files
 **/.DS_Store
 **/Thumbs.db
+
+# Frontend (Next.js / Node)
+frontend/node_modules/
+frontend/.next/
+frontend/package-lock.json
+frontend/.vercel/
+frontend/.env
+frontend/.env.*
+frontend/public/brawlers.prev.json
+
+# Local virtualenv and editor folders
+.venv/
+.idea/
+
+# Secrets and local-only files
+secrets.*
+.env
+.env.*
+
+# Generated dist/build
+.dist/

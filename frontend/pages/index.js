@@ -8,6 +8,16 @@ export default function Page(){
   const [dir,setDir] = useState(1)
   const [filter,setFilter] = useState('')
 
+  // Helper to capitalize first letter of each word and lowercase the rest; handles hyphenated names
+  const capitalize = (s) => {
+    if (s === null || s === undefined) return s
+    const str = String(s).trim()
+    if (str.length === 0) return str
+    return str.split(/\s+/).map(word =>
+      word.split('-').map(part => part ? part.charAt(0).toUpperCase() + part.slice(1).toLowerCase() : part).join('-')
+    ).join(' ')
+  }
+
   useEffect(()=>{ 
     Promise.all([
       fetch('/brawlers.json').then(r=>r.json()),
@@ -160,7 +170,7 @@ export default function Page(){
             <tbody>
               {sorted.map((r,i)=>(
                 <tr key={i}>
-                  <td>{r.Brawler}</td>
+                  <td>{capitalize(r.Brawler)}</td>
                   <td style={{backgroundColor: getPowerBg(r), color: '#000'}}>{r.Power}</td>
                   <td>{r.Trophies}</td>
                   <td>{r.Hypercharge}</td>
@@ -203,11 +213,11 @@ export default function Page(){
               <h4 style={{marginTop:0}}>Trophy changes (since last fetch)</h4>
               <div>
                 {trophyDiffs.map((d,i)=>(
-                  <div key={i} style={{display:'flex',justifyContent:'space-between',fontSize:13}}>
-                    <div>{d.Brawler}</div>
-                    <div style={{color: d.delta>0 ? 'green' : 'red'}}>{d.delta>0?`+${d.delta}`:d.delta}</div>
-                  </div>
-                ))}
+                   <div key={i} style={{display:'flex',justifyContent:'space-between',fontSize:13}}>
+                    <div>{capitalize(d.Brawler)}</div>
+                     <div style={{color: d.delta>0 ? 'green' : 'red'}}>{d.delta>0?`+${d.delta}`:d.delta}</div>
+                   </div>
+                 ))}
               </div>
 
               <div style={{borderTop:'1px solid rgba(0,0,0,0.06)', marginTop:8, paddingTop:8, display:'flex', justifyContent:'space-between', fontWeight:'bold'}}>

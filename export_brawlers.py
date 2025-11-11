@@ -1,217 +1,117 @@
 #!/usr/bin/env python3
 
-import argparse
 import os
-import re
-import shutil
-import sys
 import json
-
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
-from bs4 import BeautifulSoup
-import pandas as pd
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
+# Credentials must be provided via environment variables for security
+API_KEY = os.environ.get('BRAWL_API_KEY')
+TAG = os.environ.get('BRAWL_TAG')
+OUTPUT_JSON = os.environ.get('OUTPUT_JSON') or 'frontend/public/brawlers.json'
+HISTORY_JSON = os.path.join(os.path.dirname(OUTPUT_JSON), 'hourly_changes.json')
+HISTORY_MAX = 24
 
 
 def to_int(s, default=0):
     if s is None:
         return default
-    s = re.sub(r"[^0-9]", "", str(s))
-    return int(s) if s != "" else default
+    try:
+        return int(s)
+    except Exception:
+        s = ''.join(ch for ch in str(s) if ch.isdigit() or ch == '-')
+        try:
+            return int(s)
+        except Exception:
+            return default
 
 
-def fetch_profile(url, html_file=None, timeout=20):
-    """Fetch profile HTML. If html_file is provided and exists, read it.
-    Uses requests with retries. On CI (GITHUB_ACTIONS) we avoid launching browsers.
+def points_and_coins_to_max_for_power(power):
+    """Return (points_to_max, coins_to_max) required to reach power 11 from current power.
+    Upgrade costs are per-level (cost to go from level L to L+1) as provided.
     """
+    upgrade_costs = [
+        (20, 20),    # 1->2
+        (30, 35),    # 2->3
+        (50, 75),    # 3->4
+        (80, 140),   # 4->5
+        (130, 290),  # 5->6
+        (210, 480),  # 6->7
+        (340, 800),  # 7->8
+        (550, 1250), # 8->9
+        (890, 1875), # 9->10
+        (1440, 2800) # 10->11
+    ]
+
+    p = to_int(power, default=1)
+    if p < 1:
+        p = 1
+    if p >= 11:
+        return 0, 0
+
+    total_points = 0
+    total_coins = 0
+    for lvl in range(p, 11):
+        pts, coins = upgrade_costs[lvl - 1]
+        total_points += pts
+        total_coins += coins
+
+    return total_points, total_coins
+
+
+def fetch_player_from_brawlstars(tag, api_key, timeout=20):
+    """Fetch player JSON from the official Brawl Stars API using the provided API key.
+    The player tag must be passed without the leading '#'.
+
+    Returns parsed JSON dict on success or raises an exception on error.
+    """
+    if not api_key:
+        raise RuntimeError('API key is required to fetch from Brawl Stars API')
+
+    url = f'https://api.brawlstars.com/v1/players/%23{tag}'
     headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-        'Accept-Language': 'en-US,en;q=0.9',
-        'Referer': 'https://www.google.com/'
+        'Authorization': f'Bearer {api_key}',
+        'Accept': 'application/json',
+        'User-Agent': 'Brawl Exporter/1.0'
     }
 
-    if html_file:
-        try:
-            with open(html_file, 'r', encoding='utf-8') as f:
-                return f.read()
-        except Exception as e:
-            raise RuntimeError(f"Failed to read HTML file {html_file}: {e}") from e
-
-    # use requests with retries to be more robust against transient failures
     session = requests.Session()
     retries = Retry(total=3, backoff_factor=1, status_forcelist=[429, 500, 502, 503, 504])
     adapter = HTTPAdapter(max_retries=retries)
     session.mount('https://', adapter)
     session.mount('http://', adapter)
 
-    try:
-        r = session.get(url, headers=headers, timeout=timeout)
-        r.raise_for_status()
-        return r.text
-    except requests.exceptions.RequestException as req_err:
-        # If running in GitHub Actions or other CI, avoid invoking Playwright
-        # unless explicitly allowed by ALLOW_PLAYWRIGHT env var. This lets CI
-        # opt-in to using Playwright by setting that environment variable.
-        if os.environ.get('GITHUB_ACTIONS') and not os.environ.get('ALLOW_PLAYWRIGHT'):
-            raise RuntimeError(f"Network fetch failed in CI: {req_err}") from req_err
-
-        # try Playwright only when not in CI and playwright is available
-        try:
-            from playwright.sync_api import sync_playwright
-        except Exception:
-            raise RuntimeError(
-                "Network fetch failed and Playwright is not installed.\nInstall Playwright and the browsers with:\n  pip install playwright\n  python -m playwright install"
-            ) from req_err
-
-        with sync_playwright() as p:
-            # Extra flags for CI
-            browser = p.chromium.launch(headless=True, args=['--no-sandbox', '--disable-dev-shm-usage'])
-            page = browser.new_page(user_agent=headers['User-Agent'])
-            # increase default timeouts
-            page.set_default_navigation_timeout(90000)
-
-            # Block heavy or irrelevant resource types and common analytics domains
-            try:
-                def _route_handler(route, request):
-                    _rtype = request.resource_type
-                    url_l = request.url.lower()
-                    # abort images, stylesheets, fonts, and known analytics/ads providers to help networkidle
-                    if _rtype in ('image', 'stylesheet', 'font'):
-                        return route.abort()
-                    if any(x in url_l for x in ('google-analytics', 'googletagmanager', 'doubleclick', 'adsservice', 'facebook.net', 'optimizely')):
-                        return route.abort()
-                    return route.continue_()
-
-                page.route('**/*', _route_handler)
-            except Exception:
-                # routing may not be available in some older playwright versions, ignore silently
-                pass
-
-            last_err = None
-            try:
-                page.goto(url, wait_until='networkidle', timeout=90000)
-            except Exception as e:
-                last_err = e
-                try:
-                    page.goto(url, wait_until='load', timeout=90000)
-                except Exception as e2:
-                    last_err = e2
-                    try:
-                        page.goto(url, timeout=90000)
-                        page.wait_for_timeout(3000)
-                    except Exception as e3:
-                        browser.close()
-                        raise RuntimeError(f"Playwright failed to load {url}: {e3}") from e3
-
-            # Ensure key content present before taking HTML
-            try:
-                page.wait_for_selector('div[id^="details-"]', timeout=5000)
-            except Exception:
-                # ignore: selector may not exist but page content might still be present
-                pass
-
-            html = page.content()
-            browser.close()
-            return html
+    r = session.get(url, headers=headers, timeout=timeout)
+    r.raise_for_status()
+    return r.json()
 
 
-def parse_html(html):
-    soup = BeautifulSoup(html, 'html.parser')
-
+def parse_player_json(data):
+    """Convert Brawl Stars player JSON into the rows structure used by the project.
+    """
     rows = []
-    blocks = soup.find_all('div', id=re.compile(r'^\d+$'))
+    if not isinstance(data, dict):
+        return rows
 
-    for block in blocks:
-        header = block.find('div', attrs={'data-bs-toggle': 'collapse'})
+    brawlers = data.get('brawlers') or []
+    for b in brawlers:
+        name = b.get('name') or b.get('id') or 'UNKNOWN'
+        power = to_int(b.get('power'))
+        trophies = to_int(b.get('trophies'))
 
-        name = 'UNKNOWN'
-        power = 0
-        trophies = 0
-        gadgets = 0
-        star_powers = 0
-        gears = 0
-        points_to_max = 0
-        coins_to_max = 0
+        gadgets_val = b.get('gadgets')
+        gadgets = len(gadgets_val) if isinstance(gadgets_val, list) else to_int(gadgets_val)
 
-        if header:
-            h3 = header.find('h3')
-            if h3:
-                span = h3.find('span')
-                name = span.get_text(strip=True) if span and span.get_text(strip=True) else h3.get_text(strip=True)
-            else:
-                img = header.find('img', class_='emoji-ico')
-                if img and img.has_attr('alt'):
-                    name = img['alt'].strip()
+        star_val = b.get('starPowers') or b.get('star_powers')
+        star_powers = len(star_val) if isinstance(star_val, list) else to_int(star_val)
 
-            counts_div = header.find('div', class_=lambda c: c and 'd-none' in c and 'd-sm-block' in c)
-            if counts_div:
-                trophy_span = None
-                for sp in counts_div.find_all('span'):
-                    cl = sp.get('class') or []
-                    if any('text-orange' == x or 'text-orange' in x for x in cl) and sp.find('img'):
-                        trophy_span = sp
-                        break
-                if trophy_span:
-                    trophies = to_int(trophy_span.get_text())
+        gears_val = b.get('gears') or b.get('gear')
+        gears = len(gears_val) if isinstance(gears_val, list) else to_int(gears_val)
 
-                # try to parse trio like (1/2/3) or 1/2/3 with flexible spacing
-                txt = counts_div.get_text(" ", strip=True)
-                m = re.search(r'\(?\s*(\d+)\s*/\s*(\d+)\s*/\s*(\d+)\s*\)?', txt)
-                if m:
-                    gadgets = to_int(m.group(1))
-                    star_powers = to_int(m.group(2))
-                    gears = to_int(m.group(3))
-                else:
-                    # fallback: try anywhere in the header
-                    header_txt = header.get_text(" ", strip=True)
-                    m2 = re.search(r'\(?\s*(\d+)\s*/\s*(\d+)\s*/\s*(\d+)\s*\)?', header_txt)
-                    if m2:
-                        gadgets = to_int(m2.group(1))
-                        star_powers = to_int(m2.group(2))
-                        gears = to_int(m2.group(3))
-                    else:
-                        # last-resort: look for explicit labels
-                        g = re.search(r'gadgets\s*[:\-]?\s*(\d+)', header_txt, flags=re.I)
-                        spow = re.search(r'star\s*powers?\s*[:\-]?\s*(\d+)', header_txt, flags=re.I)
-                        gr = re.search(r'gears?\s*[:\-]?\s*(\d+)', header_txt, flags=re.I)
-                        if g: gadgets = to_int(g.group(1))
-                        if spow: star_powers = to_int(spow.group(1))
-                        if gr: gears = to_int(gr.group(1))
-            else:
-                # no counts_div - still try to extract from header text
-                header_txt = header.get_text(" ", strip=True)
-                m3 = re.search(r'\(?\s*(\d+)\s*/\s*(\d+)\s*/\s*(\d+)\s*\)?', header_txt)
-                if m3:
-                    gadgets = to_int(m3.group(1))
-                    star_powers = to_int(m3.group(2))
-                    gears = to_int(m3.group(3))
-                else:
-                    g = re.search(r'gadgets\s*[:\-]?\s*(\d+)', header_txt, flags=re.I)
-                    spow = re.search(r'star\s*powers?\s*[:\-]?\s*(\d+)', header_txt, flags=re.I)
-                    gr = re.search(r'gears?\s*[:\-]?\s*(\d+)', header_txt, flags=re.I)
-                    if g: gadgets = to_int(g.group(1))
-                    if spow: star_powers = to_int(spow.group(1))
-                    if gr: gears = to_int(gr.group(1))
-
-        details = block.find('div', id=lambda x: x and str(x).startswith('details-'))
-        if details:
-            table = details.find('table', class_=lambda c: c and 'tb-stats' in c)
-            if table:
-                for tr in table.find_all('tr'):
-                    th = tr.find('th')
-                    td = tr.find('td')
-                    if not th or not td:
-                        continue
-                    label = th.get_text(" ", strip=True).lower()
-                    val = td.get_text(" ", strip=True)
-                    if 'power' in label and 'points to max' not in label:
-                        power = to_int(val)
-                    elif 'points to max' in label:
-                        points_to_max = to_int(val)
-                    elif 'coins to max' in label:
-                        coins_to_max = to_int(val)
+        points_to_max, coins_to_max = points_and_coins_to_max_for_power(power)
 
         rows.append({
             'Brawler': name,
@@ -227,36 +127,76 @@ def parse_html(html):
     return rows
 
 
-def main():
-    parser = argparse.ArgumentParser(description='Export brawlers from brawlify profile')
-    parser.add_argument('--url', '-u', default='https://brawlify.com/stats/profile/22PLQCR29')
-    parser.add_argument('--html-file', '-f', help='Read profile HTML from local file')
-    parser.add_argument('--output', '-o', default='frontend/public/brawlers.json')
-    args = parser.parse_args()
-
-    output_json = args.output
-
+def load_json_safe(path):
+    """Load JSON data from a file, return None if any error occurs."""
     try:
-        html = fetch_profile(args.url, html_file=args.html_file)
-    except Exception as e:
-        # In CI we prefer to avoid failing if there's an existing output file.
-        print(f"Warning: failed to fetch profile HTML: {e}")
-        if os.path.exists(output_json):
-            print(f"Using existing output file: {output_json}")
-            return
-        else:
-            raise
+        with open(path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except Exception:
+        return None
 
-    rows = parse_html(html)
-    if not rows:
-        print('Hiç brawler bulunamadı. Dosya yolunu kontrol edin.')
+
+def save_json_safe(path, data):
+    """Save JSON data to a file, creating directories as needed."""
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+
+def build_trophies_map(records):
+    """Build a map of brawler names to trophy counts from the records."""
+    return {r.get('Brawler'): to_int(r.get('Trophies')) for r in records if r.get('Brawler')}
+
+
+def format_changes(prev_map, curr_map):
+    """Format the changes in trophies between two maps for display."""
+    # calculate diffs for brawlers present in either
+    names = set(prev_map.keys()) | set(curr_map.keys())
+    changes = []
+    total = 0
+    for n in sorted(names):
+        prev = prev_map.get(n, 0)
+        curr = curr_map.get(n, 0)
+        diff = curr - prev
+        if diff != 0:
+            sign = '+' if diff > 0 else ''
+            changes.append(f"{n} {sign}{diff}")
+            total += diff
+            if len(changes) >= 24:
+                break
+    return changes, total
+
+
+def current_turkey_timestamp():
+    """Return the current timestamp in Turkey timezone."""
+    tz = ZoneInfo('Europe/Istanbul')
+    now = datetime.now(tz)
+    return now.strftime('%Y-%m-%d %H:%M %Z')
+
+
+def main():
+    # ensure credentials provided
+    if not API_KEY:
+        print('Error: BRAWL_API_KEY environment variable is not set.')
+        print('Set it in your environment or GitHub Actions secrets as BRAWL_API_KEY.')
+        return
+    if not TAG:
+        print('Error: BRAWL_TAG environment variable is not set.')
+        print('Set it in your environment or GitHub Actions secrets as BRAWL_TAG.')
         return
 
-    df = pd.DataFrame(rows, columns=['Brawler', 'Power', 'Trophies', 'Gadgets', 'Star Powers', 'Gears', 'Points to MAX', 'Coins to MAX'])
+    # fetch current data from API
+    player_json = fetch_player_from_brawlstars(TAG, API_KEY)
+    rows = parse_player_json(player_json)
 
-    total_trophies = int(df['Trophies'].sum()) if 'Trophies' in df.columns else 0
-    total_points_to_max = int(df['Points to MAX'].sum()) if 'Points to MAX' in df.columns else 0
-    total_coins_to_max = int(df['Coins to MAX'].sum()) if 'Coins to MAX' in df.columns else 0
+    if not rows:
+        print('No brawlers found in API response.')
+        return
+
+    # compute totals and append TOTAL row
+    total_trophies = sum(to_int(r.get('Trophies')) for r in rows)
+    total_points = sum(to_int(r.get('Points to MAX')) for r in rows)
+    total_coins = sum(to_int(r.get('Coins to MAX')) for r in rows)
 
     total_row = {
         'Brawler': 'TOTAL',
@@ -265,48 +205,40 @@ def main():
         'Gadgets': '',
         'Star Powers': '',
         'Gears': '',
-        'Points to MAX': total_points_to_max,
-        'Coins to MAX': total_coins_to_max
+        'Points to MAX': total_points,
+        'Coins to MAX': total_coins
     }
-    df = pd.concat([df, pd.DataFrame([total_row])], ignore_index=True)
 
-    overrides_json = os.path.join(os.path.dirname(output_json), 'overrides.json')
-    records = df.fillna('').to_dict(orient='records')
+    merged_records = rows + [total_row]
 
-    os.makedirs(os.path.dirname(output_json), exist_ok=True)
+    # read previous output (if any) to compute trophy changes
+    prev_records = load_json_safe(OUTPUT_JSON) or []
+    prev_map = build_trophies_map(prev_records)
+    curr_map = build_trophies_map(rows)
 
-    overrides_map = {}
-    if os.path.exists(overrides_json):
-        try:
-            with open(overrides_json, 'r', encoding='utf-8') as of:
-                overrides_map = json.load(of) or {}
-        except Exception:
-            overrides_map = {}
-    else:
-        for r in records:
-            name = r.get('Brawler')
-            if not name or str(name).strip().upper() == 'TOTAL':
-                continue
-            overrides_map[name] = {'Hypercharge': 'Yes'}
+    changes, total_diff = format_changes(prev_map, curr_map)
 
-    merged_records = []
-    for r in records:
-        name = r.get('Brawler')
-        extra = overrides_map.get(name, {})
-        merged = {**r, **extra}
-        merged_records.append(merged)
+    # prepare history card
+    timestamp = current_turkey_timestamp()
+    card_lines = changes[:24]
+    # ensure total line last
+    card = {
+        'timestamp': timestamp,
+        'lines': card_lines,
+        'total': total_diff
+    }
 
-    prev_path = os.path.join(os.path.dirname(output_json), 'brawlers.prev.json')
-    if os.path.exists(output_json):
-        try:
-            shutil.copyfile(output_json, prev_path)
-        except Exception:
-            pass
+    # load existing history, prepend new card, trim to HISTORY_MAX
+    history = load_json_safe(HISTORY_JSON) or []
+    history.insert(0, card)
+    if len(history) > HISTORY_MAX:
+        history = history[:HISTORY_MAX]
 
-    with open(output_json, 'w', encoding='utf-8') as jf:
-        json.dump(merged_records, jf, ensure_ascii=False, indent=2)
+    # write outputs
+    save_json_safe(OUTPUT_JSON, merged_records)
+    save_json_safe(HISTORY_JSON, history)
 
-    print(f'Kaydedildi: {output_json}')
+    print(f'Saved: {OUTPUT_JSON} and updated history with timestamp {timestamp}')
 
 
 if __name__ == '__main__':
