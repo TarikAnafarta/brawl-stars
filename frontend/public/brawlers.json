@@ -11,6 +11,17 @@
     "Hypercharge": "No"
   },
   {
+    "Brawler": "Kaze",
+    "Power": 11,
+    "Trophies": 1004,
+    "Gadgets": 1,
+    "Star Powers": 1,
+    "Gears": 2,
+    "Points to MAX": 0,
+    "Coins to MAX": 0,
+    "Hypercharge": "Yes"
+  },
+  {
     "Brawler": "Kit",
     "Power": 11,
     "Trophies": 760,
@@ -22,20 +33,9 @@
     "Hypercharge": "Yes"
   },
   {
-    "Brawler": "Kaze",
-    "Power": 11,
-    "Trophies": 977,
-    "Gadgets": 1,
-    "Star Powers": 1,
-    "Gears": 2,
-    "Points to MAX": 0,
-    "Coins to MAX": 0,
-    "Hypercharge": "Yes"
-  },
-  {
     "Brawler": "El Primo",
     "Power": 11,
-    "Trophies": 1278,
+    "Trophies": 1215,
     "Gadgets": 1,
     "Star Powers": 2,
     "Gears": 2,
@@ -1058,7 +1058,7 @@
   {
     "Brawler": "TOTAL",
     "Power": "",
-    "Trophies": 76131,
+    "Trophies": 76095,
     "Gadgets": "",
     "Star Powers": "",
     "Gears": "",
