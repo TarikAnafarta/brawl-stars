@@ -322,10 +322,10 @@
   {
     "Brawler": "MAX",
     "Power": 11,
-    "Trophies": 550,
+    "Trophies": 627,
     "Gadgets": 2,
-    "Star Powers": 1,
-    "Gears": 0,
+    "Star Powers": 2,
+    "Gears": 1,
     "Points to MAX": 0,
     "Coins to MAX": 0
   },
@@ -962,7 +962,7 @@
   {
     "Brawler": "TOTAL",
     "Power": "",
-    "Trophies": 76434,
+    "Trophies": 76511,
     "Gadgets": "",
     "Star Powers": "",
     "Gears": "",
