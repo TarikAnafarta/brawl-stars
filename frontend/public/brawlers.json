@@ -551,13 +551,13 @@
   },
   {
     "Brawler": "JANET",
-    "Power": 5,
-    "Trophies": 445,
-    "Gadgets": 0,
-    "Star Powers": 0,
+    "Power": 11,
+    "Trophies": 462,
+    "Gadgets": 2,
+    "Star Powers": 1,
     "Gears": 0,
-    "Points to MAX": 3560,
-    "Coins to MAX": 7495
+    "Points to MAX": 0,
+    "Coins to MAX": 0
   },
   {
     "Brawler": "BONNIE",
@@ -962,11 +962,11 @@
   {
     "Brawler": "TOTAL",
     "Power": "",
-    "Trophies": 76818,
+    "Trophies": 76835,
     "Gadgets": "",
     "Star Powers": "",
     "Gears": "",
-    "Points to MAX": 124640,
-    "Coins to MAX": 258355
+    "Points to MAX": 121080,
+    "Coins to MAX": 250860
   }
 ]
