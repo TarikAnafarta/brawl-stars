@@ -142,7 +142,7 @@
   {
     "Brawler": "BO",
     "Power": 11,
-    "Trophies": 1000,
+    "Trophies": 1025,
     "Gadgets": 2,
     "Star Powers": 2,
     "Gears": 1,
@@ -402,7 +402,7 @@
   {
     "Brawler": "LOU",
     "Power": 11,
-    "Trophies": 1000,
+    "Trophies": 1003,
     "Gadgets": 2,
     "Star Powers": 2,
     "Gears": 1,
@@ -552,7 +552,7 @@
   {
     "Brawler": "JANET",
     "Power": 11,
-    "Trophies": 660,
+    "Trophies": 784,
     "Gadgets": 2,
     "Star Powers": 1,
     "Gears": 0,
@@ -962,7 +962,7 @@
   {
     "Brawler": "TOTAL",
     "Power": "",
-    "Trophies": 77036,
+    "Trophies": 77188,
     "Gadgets": "",
     "Star Powers": "",
     "Gears": "",
