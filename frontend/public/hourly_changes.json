@@ -1,5 +1,15 @@
 [
   {
+    "timestamp": "2025-11-15 01:16 +03",
+    "lines": [
+      "JANET +35",
+      "MEG +1",
+      "MINA +10",
+      "PAM +41"
+    ],
+    "total": 87
+  },
+  {
     "timestamp": "2025-11-14 23:20 +03",
     "lines": [
       "MINA -2"
