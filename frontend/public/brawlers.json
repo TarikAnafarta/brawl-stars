@@ -351,13 +351,13 @@
   },
   {
     "Brawler": "NANI",
-    "Power": 8,
-    "Trophies": 723,
+    "Power": 9,
+    "Trophies": 730,
     "Gadgets": 2,
     "Star Powers": 0,
     "Gears": 0,
-    "Points to MAX": 2880,
-    "Coins to MAX": 5925
+    "Points to MAX": 2330,
+    "Coins to MAX": 4675
   },
   {
     "Brawler": "SPROUT",
@@ -962,11 +962,11 @@
   {
     "Brawler": "TOTAL",
     "Power": "",
-    "Trophies": 77640,
+    "Trophies": 77647,
     "Gadgets": "",
     "Star Powers": "",
     "Gears": "",
-    "Points to MAX": 121080,
-    "Coins to MAX": 250860
+    "Points to MAX": 120530,
+    "Coins to MAX": 249610
   }
 ]
